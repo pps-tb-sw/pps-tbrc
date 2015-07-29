@@ -1,7 +1,7 @@
 #include "VMEReader.h"
 
-VMEReader::VMEReader(const char *device, VME::BridgeType type, bool on_socket) :
-  Client(1987), fBridge(0), fSG(0), fFPGA(0), fOnSocket(on_socket), fIsPulserStarted(false)
+VMEReader::VMEReader(const char *device, VME::BridgeType type, std::string name, bool on_socket) :
+  Client(name, 1987), fBridge(0), fSG(0), fFPGA(0), fOnSocket(on_socket), fIsPulserStarted(false)
 {
   try {
     if (fOnSocket) Client::Connect(DETECTOR);

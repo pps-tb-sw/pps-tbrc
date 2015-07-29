@@ -25,7 +25,7 @@ class VMEReader : public Client
      * \param[in] type Bridge model
      * \param[in] on_socket Are we trying to connect through the socket?
      */
-    VMEReader(const char *device, VME::BridgeType type, bool on_socket=true);
+    VMEReader(const char *device, VME::BridgeType type, std::string name="daq", bool on_socket=true);
     virtual ~VMEReader();
 
     /**

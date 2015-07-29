@@ -182,6 +182,17 @@ Messenger::ProcessMessage(SocketMessage m, int sid)
     DisconnectClient(m.GetIntValue(), key);
     throw Exception(__PRETTY_FUNCTION__, "Removing socket client", Info, 11001);
   }
+  else if (m.GetKey()==CLIENT_NAME) {
+    ClientNames::iterator it = fClientNames.find(sid);
+    if (it!=fClientNames.end()) {
+      it->second = m.GetValue();
+    }
+    else fClientNames.insert(std::pair<int,std::string>(sid, m.GetValue()));
+  }
+  else if (m.GetKey()==GET_CLIENT_NAME) {
+    ClientNames::iterator it = fClientNames.find(sid);
+    if (it!=fClientNames.end()) { Send(SocketMessage(CLIENT_NAME, it->second), sid); }
+  }
   else if (m.GetKey()==PING_CLIENT) {
     const int toping = m.GetIntValue();
     Send(SocketMessage(PING_CLIENT), toping);
@@ -193,7 +204,7 @@ Messenger::ProcessMessage(SocketMessage m, int sid)
     int i = 0; std::ostringstream os;
     for (SocketCollection::const_iterator it=fSocketsConnected.begin(); it!=fSocketsConnected.end(); it++, i++) {
       if (i!=0) os << ";";
-      os << it->first << " (type " << static_cast<int>(it->second) << ")";
+      os << it->first << " (name: " << GetClientName(sid) << ", type " << static_cast<int>(it->second) << ")";
     }
     try { Send(SocketMessage(CLIENTS_LIST, os.str()), sid); } catch (Exception& e) { e.Dump(); }
   }
@@ -204,7 +215,7 @@ Messenger::ProcessMessage(SocketMessage m, int sid)
       if (i!=0) os << ";";
       os << it->first << ",";
       if (it->first==GetSocketId()) os << "Master,";
-      else os << "Client" << it->first << ",";
+      else os << GetClientName(it->first) << ",";
       os << static_cast<int>(type) << "\0";
     }
     try { Send(SocketMessage(CLIENTS_LIST, os.str()), sid); } catch (Exception& e) { e.Dump(); }

@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   const int port = atoi(argv[1]);
   cout << "Starting to listen on port " << port << endl;
 
-  l = new Client(port);
+  l = new Client("term", port);
   if (!l->Connect()) {
     cout << "Failed to connect the listener" << endl;
     return -1;

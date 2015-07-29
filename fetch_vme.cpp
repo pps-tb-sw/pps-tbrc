@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 
   try {
     bool with_socket = true;
-    vme = new VMEReader("/dev/a2818_0", VME::CAEN_V2718, with_socket);
+    vme = new VMEReader("/dev/a2818_0", VME::CAEN_V2718, "daq", with_socket);
     vme->ReadXML(xml_config);
   
     static const unsigned int num_tdc = vme->GetNumTDC();

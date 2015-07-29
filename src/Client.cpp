@@ -1,7 +1,7 @@
 #include "Client.h"
 
-Client::Client(int port) :
-  Socket(port), fClientId(-1), fIsConnected(false)
+Client::Client(std::string name, int port) :
+  Socket(port), fName(name), fClientId(-1), fIsConnected(false)
 {}
 
 Client::~Client()
@@ -45,6 +45,8 @@ Client::Announce()
       default:
         throw Exception(__PRETTY_FUNCTION__, "Received an invalid answer from server", JustWarning);
     }
+
+    SendMessage(SocketMessage(CLIENT_NAME, GetName()));
     
   } catch (Exception& e) {
     e.Dump();

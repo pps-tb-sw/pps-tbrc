@@ -245,7 +245,10 @@ function create_block(obj) {
   block.className = "socket_block";
   
   var title = document.createElement("div");
-  title.innerHTML = obj.name;
+  /*title.innerHTML = obj.name;*/
+  connection.send("GET_CLIENT_NAME:"+obj.id);
+  alert("GET_CLIENT_NAME:"+obj.id);
+  connection.onmessage = function(event) { title.innerHTML = event.data.value(); }
   title.className = "socket_block_title";
   block.appendChild(title);
   

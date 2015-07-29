@@ -85,10 +85,17 @@ class Messenger : public Socket
      * \param[in] Unique identifier of the client sending the message
      */
     void ProcessMessage(SocketMessage m, int sid);
+    inline std::string GetClientName(int sid) {
+      ClientNames::const_iterator it = fClientNames.find(sid);
+      if (it!=fClientNames.end()) return it->second;
+      return "[invalid]";
+    }
+
     WebSocket* fWS;
     int fNumAttempts;
     pid_t fPID;
-    
+    typedef std::map<int, std::string> ClientNames;
+    ClientNames fClientNames;
     int fStdoutPipe[2], fStderrPipe[2];
 };
 

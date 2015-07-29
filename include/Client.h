@@ -18,9 +18,9 @@ class Client : public Socket
 {
   public:
     /// General void client constructor
-    inline Client() {;}
+    inline Client() : fName("generic_client") {;}
     /// Bind a socket client to a given port
-    Client(int port);
+    Client(std::string name, int port);
     virtual ~Client();
 
     /// Bind this client to the socket
@@ -47,11 +47,14 @@ class Client : public Socket
     virtual void ParseMessage(const SocketMessage& m) {;}
     /// Socket actor type retrieval method
     virtual SocketType GetType() const { return fType; }
-  
+    
+    inline std::string GetName() const { return fName; }
+
   private:
     /// Announce our entry on the socket to its master
     void Announce();
   
+    std::string fName;
     int fClientId;
     bool fIsConnected;
     SocketType fType;
