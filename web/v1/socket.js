@@ -94,9 +94,11 @@ function bind_socket() {
     }
     unbind_socket();
   }
-  connection.onopen = function () {};
+  connection.onopen = function () { };
   connection.onmessage = function(event) { parse_message(event); };
   connection.onclose = function() { connection = 0; bind_socket(); };
+
+  connection.send("CLIENT_NAME:GUI");
 }
   
 function unbind_socket() {
@@ -247,8 +249,7 @@ function create_block(obj) {
   var title = document.createElement("div");
   /*title.innerHTML = obj.name;*/
   connection.send("GET_CLIENT_NAME:"+obj.id);
-  alert("GET_CLIENT_NAME:"+obj.id);
-  connection.onmessage = function(event) { title.innerHTML = event.data.value(); }
+  connection.onmessage = function(event) { title.innerHTML = event.data.value(); alert(event.data); }
   title.className = "socket_block_title";
   block.appendChild(title);
   
