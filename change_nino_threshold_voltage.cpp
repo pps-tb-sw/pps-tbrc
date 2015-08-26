@@ -15,7 +15,9 @@ int main(int argc, char *argv[]) {
   VME::FPGAUnitV1495* fpga = vme->GetFPGAUnit();
   const bool use_fpga = (fpga!=0);
 
-  uint32_t Vth = 10 ;
+  uint32_t Vth = 10;
+  std::cout << "How much should the threshold value? ";
+  std::cin >> Vth;
   if (use_fpga) {
     fpga->SetThresholdVoltage(Vth);
     std::cout << "The readback value of the Threshold Voltage is: " << fpga->GetThresholdVoltage() << std::endl;
