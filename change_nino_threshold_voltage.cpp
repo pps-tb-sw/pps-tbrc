@@ -7,7 +7,7 @@ VMEReader* vme;
 int gEnd = 0;
 
 int main(int argc, char *argv[]) {
-  uint32_t address =  0x00ee0000;
+  uint32_t address =  0x32100000;
   bool with_socket = true;
 
   vme = new VMEReader("/dev/a2818_0", VME::CAEN_V2718, with_socket);
