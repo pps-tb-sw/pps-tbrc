@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
   uint32_t Vth = 10;
   std::cout << "How much should the threshold value? ";
   std::cin >> Vth;
+  std::cout << std::endl;
   if (use_fpga) {
     fpga->SetThresholdVoltage(Vth);
     std::cout << "The readback value of the Threshold Voltage is: " << fpga->GetThresholdVoltage() << std::endl;
