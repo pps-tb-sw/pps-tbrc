@@ -1,0 +1,1 @@
+/usr/bin/c++       -lsqlite3 CMakeFiles/testdb.dir/testdb.cpp.o ../CMakeFiles/reader_lib.dir/src/FileReader.cpp.o  -o testdb -rdynamic 
