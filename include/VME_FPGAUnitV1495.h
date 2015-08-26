@@ -17,6 +17,7 @@ namespace VME
     kV1495Control           = 0x1020,
     kV1495TriggerSettings   = 0x1024,
     kV1495OutputSettings    = 0x1028,
+    kV1495ThresholdVoltage  = 0x1028,
     // CAEN board registers
     kV1495GeoAddress        = 0x8008,
     kV1495UserFPGAFlashMem  = 0x8014,
@@ -35,8 +36,7 @@ namespace VME
     kV1495HWRevision1       = 0x8148,
     kV1495HWRevision0       = 0x814c,
     kV1495SerNum0           = 0x8180,
-    kV1495SerNum1           = 0x8184,
-    kV1495ThresholdVoltage  = 0x8184
+    kV1495SerNum1           = 0x8184
   };
 
   /**
