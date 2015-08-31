@@ -45,7 +45,8 @@ int main(int argc, char* argv[]) {
   cout << "Search in directory: " << getenv("PPS_DATA_PATH") << endl;
   VME::TDCMeasurement m; VME::TDCEvent e;
   int num_triggers = 0, num_channel_measurements[num_channels];
-  double has_leading_per_trigger[num_channels];
+  //double has_leading_per_trigger[num_channels];
+  uint has_leading_per_trigger[num_channels]; // the same type as fLeadingEdge
 
   for (int sp=1; sp<10000000; sp++) { // we loop over all spills
     search1.str(""); search1 << "events_" << run_id << "_" << sp << "_";
@@ -96,14 +97,19 @@ int main(int argc, char* argv[]) {
         else if (e.GetType()==VME::TDCEvent::TDCMeasurement) {
           unsigned int ch_id = e.GetChannelId();
           if (!e.IsTrailing()) {
-            has_leading_per_trigger[ch_id] =  e.GetTime()*25./1024.;
+            //has_leading_per_trigger[ch_id] =  e.GetTime()*25./1024.;
+            has_leading_per_trigger[ch_id] =  e.GetTime(); // GetTime should return an integer -- bare bits
 	    //	  cout << "\tTDCMeasurement Leading edge: channel " << ch_id << ": " << has_leading_per_trigger[ch_id] << endl;
           }
           else {
-	    double trailing_time = e.GetTime()*25./1024.;
+	          //double trailing_time = e.GetTime()*25./1024.;
+
+            // why isn't it an array?
+            uint trailing_time = e.GetTime(); // GetTime should return an integer -- bare bits
+
 	    //	  cout << "\tTDCMeasurement Trailing edge: channel " << ch_id << ": " << trailing_time << endl;
 	    //	  cout << "\tTDCMeasurement Trailing edge: channel " << ch_id << ": " << trailing_time-has_leading_per_trigger[ch_id] << endl;
-            if (has_leading_per_trigger[ch_id]==0.) continue;
+            if (has_leading_per_trigger[ch_id]==0) continue;
 
 	    fChannelId[fNumMeasurements] = ch_id;
 	    fLeadingEdge[fNumMeasurements] = has_leading_per_trigger[ch_id];
@@ -111,7 +117,7 @@ int main(int argc, char* argv[]) {
 	    fToT[fNumMeasurements] = fTrailingEdge[fNumMeasurements]-fLeadingEdge[fNumMeasurements];
             num_channel_measurements[ch_id]++;
             fNumMeasurements++;
-            has_leading_per_trigger[ch_id] = 0.;
+            has_leading_per_trigger[ch_id] = 0;
           }
         }
         else if (e.GetType()==VME::TDCEvent::ETTT) {
