@@ -392,25 +392,27 @@ namespace VME
   FPGAUnitV1495::SetThresholdVoltage(uint32_t voltage, uint32_t tdc_number) const
   {
     voltage = voltage % 1024; 	// DAC threshold voltage is difference between two 12-bit numbers
+    uint32_t oldvoltage = 0x0;
     sleep(1);
     try { 
-      if (tdc_number == 0){
-         WriteRegister(kV1495ThresholdVoltage, OneVolt);
+    ReadRegister(kV1495ThresholdVoltage, &oldvoltage);
+       if (tdc_number == 0){
+         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0xFFFF0000) + OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, cH1 + OneVolt + voltage);
+         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + voltage);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, cH2 + OneVolt);
+         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0xFFFF0000) + cH2 + OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, cH3 + OneVolt + voltage);
+         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + voltage);
       }
       if (tdc_number == 1){
-         WriteRegister(kV1495ThresholdVoltage, 65536 * OneVolt);
+         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0x0000FFFF) + 0x00010000 * OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, 65536 * (cH1 + OneVolt + voltage));
+         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + voltage));
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, 65536 * (cH2 + OneVolt));
+         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH2 + OneVolt));
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, 65536 * (cH3 + OneVolt + voltage));
+         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + voltage));
       }
     } catch (Exception& e) {
       e.Dump();
