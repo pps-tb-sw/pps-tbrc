@@ -15,7 +15,11 @@
     <source>internal</source>
     <poi>4294967295</poi>
   </signal>
-</fpga>
+  <threshold>
+    <tdc0>external</tdc0>
+    <tdc1>external</tdc1>
+  </threshold>
+  </fpga>
 <tdc address="0x00aa0000">
   <detector>gastof</detector>
   <verbosity>1</verbosity>
