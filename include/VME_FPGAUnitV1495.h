@@ -187,7 +187,7 @@ namespace VME
        * \brief Set the threshold voltage
        * \param[in] Threshold voltage (in units of 50 ns)
        */
-      void SetThresholdVoltage(uint32_t voltage) const;
+      void SetThresholdVoltage(uint32_t voltage, uint32_t tdc_number) const;
 
       uint32_t GetOutputPulser() const;
       void ClearOutputPulser() const;
