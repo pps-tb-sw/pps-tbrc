@@ -182,7 +182,7 @@ VMEReader::ReadXML(const char* filename)
   unsigned int run = GetRunNumber();
   std::ifstream source(filename, std::ios::binary);
   std::stringstream out_name; out_name << std::getenv("PPS_PATH") << "/config/config_run" << run << ".xml";
-  std::ofstream dest(out_name.str().c_str(), ios::binary);
+  std::ofstream dest(out_name.str().c_str(), std::ios::binary);
   dest << source.rdbuf();
   if (fOnSocket) Client::Send(Exception(__PRETTY_FUNCTION__, "Ready to release veto!", Info));
 
