@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
      std::cin >> Vth;
      std::cout << std::endl;
      if (use_fpga) {
-       fpga->SetThresholdVoltage(Vth);
+       fpga->SetThresholdVoltage(Vth, 0);
        std::cout << "You asked for: "<< Vth << " and the readback value of the Threshold Voltage is: " << fpga->GetThresholdVoltage() << std::endl;
      }
   }
