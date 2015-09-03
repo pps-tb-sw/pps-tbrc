@@ -45,7 +45,7 @@ namespace VME
     cH2                     = 8192,
     cH3                     = 12288
   };
-  const OneVolt		    = 1634;
+  const int OneVolt	    = 1634;
   /**
    * User-defined control word to be propagated to the
    * CAEN V1495 board firmware.
