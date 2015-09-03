@@ -83,6 +83,14 @@ VMEReader::ReadXML(const char* filename)
             fFPGA->SetOutputPulserPOI(atoi(poi->GetText()));
           }
         }
+	if (tinyxml2::XMLElement* vth=fpga->FirstChildElement("threshold")) {
+          if (tinyxml2::XMLElement* tdc0=sig->FirstChildElement("tdc0")) {
+            fFPGA->SetThresholdVoltage(atoi(tdc0->GetText()), 0);
+          }
+          if (tinyxml2::XMLElement* tdc1=sig->FirstChildElement("tdc1")) {
+            fFPGA->SetThresholdVoltage(atoi(tdc1->GetText()), 1);
+          }
+        }
         switch (fGlobalAcqMode) {
           case ContinuousStorage:
           case TriggerStart:

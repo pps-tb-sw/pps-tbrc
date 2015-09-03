@@ -38,7 +38,14 @@ namespace VME
     kV1495SerNum0           = 0x8180,
     kV1495SerNum1           = 0x8184
   };
-
+  enum FPGAUnitV1495DACCH {
+    // User-defined registers
+    cH0     		    = 0,
+    cH1                     = 4096,
+    cH2                     = 8192,
+    cH3                     = 12288
+  };
+  const OneVolt		    = 1634;
   /**
    * User-defined control word to be propagated to the
    * CAEN V1495 board firmware.

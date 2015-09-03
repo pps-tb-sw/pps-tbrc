@@ -389,10 +389,30 @@ namespace VME
   }
 
   void
-  FPGAUnitV1495::SetThresholdVoltage(uint32_t voltage) const
+  FPGAUnitV1495::SetThresholdVoltage(uint32_t voltage, uint32_t tdc_number) const
   {
+    voltage = voltage % 1024; 	// DAC threshold voltage is difference between two 12-bit numbers
     sleep(1);
-    try { WriteRegister(kV1495ThresholdVoltage, voltage); } catch (Exception& e) {
+    try { 
+      if (tdc_number == 0){
+         WriteRegister(kV1495ThresholdVoltage, OneVolt);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage, cH1 + OneVolt + voltage);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage, cH2 + OneVolt);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage, cH3 + OneVolt + voltage);
+      }
+      if (tdc_number == 1){
+         WriteRegister(kV1495ThresholdVoltage, 65536 * OneVolt);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage, 65536 * (cH1 + OneVolt + voltage));
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage, 65536 * (cH2 + OneVolt));
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage, 65536 * (cH3 + OneVolt + voltage));
+      }
+    } catch (Exception& e) {
       e.Dump();
       throw Exception(__PRETTY_FUNCTION__, "Failed to set the threshold voltage to FW", JustWarning);
     }
