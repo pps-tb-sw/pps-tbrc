@@ -396,6 +396,7 @@ namespace VME
   {
     voltage = voltage % 1024; 	// DAC threshold voltage is difference between two 12-bit numbers
     uint32_t oldvoltage = 0x0;
+    uint32_t digitalValue = 0x0;
     sleep(1);
     try { 
       if (tdc_number < 2)
@@ -403,40 +404,48 @@ namespace VME
       else
          ReadRegister(kV1495ThresholdVoltage1, &oldvoltage);
       if (tdc_number == 0){
-         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + OneVolt);
+	 WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + voltage);
+         digitalValue = (uint32_t) std:round(1.758683*voltage-15.74276);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + digitalValue);
          sleep(1);
          WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH2 + OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + voltage);
+         digitalValue = (uint32_t) std:round(1.753127*voltage-15.45482);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + digitalValue);
       }
       if (tdc_number == 1){
          WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + voltage));
+         digitalValue = (uint32_t) std:round(1.758683*voltage-15.74276);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + digitalValue));
          sleep(1);
          WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH2 + OneVolt));
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + voltage));
+         digitalValue = (uint32_t) std:round(1.753127*voltage-15.45482);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + digitalValue));
       }
       if (tdc_number == 2){
          WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + voltage);
+         digitalValue = (uint32_t) std:round(1.70261*voltage-30.023);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + digitalValue);
          sleep(1);
          WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH2 + OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + voltage);
+         digitalValue = (uint32_t) std:round(1.712739*voltage-3.96861);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + digitalValue);
       }
       if (tdc_number == 3){
          WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + voltage));
+         digitalValue = (uint32_t) std:round(1.703834*voltage-0.54032);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + digitalValue));
          sleep(1);
          WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH2 + OneVolt));
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + voltage));
+         digitalValue = (uint32_t) std:round(1.702613*voltage+20.28103);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + digitalValue));
       }
     } catch (Exception& e) {
       e.Dump();
