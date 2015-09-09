@@ -397,22 +397,40 @@ namespace VME
     try { 
     ReadRegister(kV1495ThresholdVoltage, &oldvoltage);
        if (tdc_number == 0){
-         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0xFFFF0000) + OneVolt);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + voltage);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + voltage);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0xFFFF0000) + cH2 + OneVolt);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH2 + OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + voltage);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + voltage);
       }
       if (tdc_number == 1){
-         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0x0000FFFF) + 0x00010000 * OneVolt);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * OneVolt);
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + voltage));
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + voltage));
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH2 + OneVolt));
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH2 + OneVolt));
          sleep(1);
-         WriteRegister(kV1495ThresholdVoltage, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + voltage));
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + voltage));
+      }
+      if (tdc_number == 2){
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + OneVolt);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + voltage);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH2 + OneVolt);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + voltage);
+      }
+      if (tdc_number == 3){
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * OneVolt);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + voltage));
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH2 + OneVolt));
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + voltage));
       }
     } catch (Exception& e) {
       e.Dump();
