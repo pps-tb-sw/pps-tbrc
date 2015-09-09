@@ -90,6 +90,12 @@ VMEReader::ReadXML(const char* filename)
           if (tinyxml2::XMLElement* tdc1=vth->FirstChildElement("tdc1")) {
             fFPGA->SetThresholdVoltage(atoi(tdc1->GetText()), 1);
           }
+          if (tinyxml2::XMLElement* tdc2=vth->FirstChildElement("tdc2")) {
+            fFPGA->SetThresholdVoltage(atoi(tdc2->GetText()), 2);
+          }
+          if (tinyxml2::XMLElement* tdc3=vth->FirstChildElement("tdc3")) {
+            fFPGA->SetThresholdVoltage(atoi(tdc2->GetText()), 3);
+          }
         }
         switch (fGlobalAcqMode) {
           case ContinuousStorage:

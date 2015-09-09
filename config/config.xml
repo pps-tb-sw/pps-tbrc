@@ -16,8 +16,10 @@
     <poi>4294967295</poi>
   </signal>
   <threshold>
-    <tdc0>external</tdc0>
-    <tdc1>external</tdc1>
+    <tdc0>20</tdc0>
+    <tdc1>20</tdc1>
+    <tdc2>20</tdc2>
+    <tdc3>20</tdc3>
   </threshold>
   </fpga>
 <tdc address="0x00aa0000">
