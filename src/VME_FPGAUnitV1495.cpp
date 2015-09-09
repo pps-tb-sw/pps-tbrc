@@ -377,11 +377,14 @@ namespace VME
   }
 
  uint32_t
-  FPGAUnitV1495::GetThresholdVoltage() const
+  FPGAUnitV1495::GetThresholdVoltage(uint32_t tdc_number) const
   {
     uint32_t voltage = 0x0;
     sleep(1);
-    try { ReadRegister(kV1495ThresholdVoltage, &voltage); } catch (Exception& e) {
+    try {if (tdc_number < 2)
+          ReadRegister(kV1495ThresholdVoltage0, &voltage);
+      else
+          ReadRegister(kV1495ThresholdVoltage1, &voltage); } catch (Exception& e) {
       e.Dump();
       throw Exception(__PRETTY_FUNCTION__, "Failed to retrieve the threshold voltage from FW", JustWarning);
     }

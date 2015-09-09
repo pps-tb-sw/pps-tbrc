@@ -183,7 +183,7 @@ namespace VME
        * \brief Retrieve the threshold voltage
        * \return Threshold voltage (in units of 50 ns)
        */
-      uint32_t GetThresholdVoltage() const;
+      uint32_t GetThresholdVoltage(uint32_t tdc_number) const;
       /**
        * \brief Set the threshold voltage
        * \param[in] Threshold voltage (in units of 50 ns)
