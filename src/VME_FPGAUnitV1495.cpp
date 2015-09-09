@@ -395,8 +395,11 @@ namespace VME
     uint32_t oldvoltage = 0x0;
     sleep(1);
     try { 
-    ReadRegister(kV1495ThresholdVoltage, &oldvoltage);
-       if (tdc_number == 0){
+      if (tdc_number < 2)
+         ReadRegister(kV1495ThresholdVoltage0, &oldvoltage);
+      else
+         ReadRegister(kV1495ThresholdVoltage1, &oldvoltage);
+      if (tdc_number == 0){
          WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + OneVolt);
          sleep(1);
          WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + voltage);
@@ -415,7 +418,7 @@ namespace VME
          WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + voltage));
       }
       if (tdc_number == 2){
-         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + OneVolt);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + OneVolt);
          sleep(1);
          WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + voltage);
          sleep(1);
