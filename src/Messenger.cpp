@@ -289,6 +289,6 @@ Messenger::StopAcquisition()
        << "Return value: " << ret << " (errno=" << errno << ")";
     throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
   }
-  SendAll(DQM, SocketMessage(ACQUISITION_STOPPED));
+  SendAll(DAQ, SocketMessage(ACQUISITION_STOPPED));
   throw Exception(__PRETTY_FUNCTION__, "Acquisition stop signal sent!", Info, 30001);
 }
