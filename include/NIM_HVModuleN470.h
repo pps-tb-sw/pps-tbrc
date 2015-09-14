@@ -161,6 +161,8 @@ namespace NIM
       void SetChannelI0(unsigned short ch_id, unsigned short i0) const;
       void SetChannelV1(unsigned short ch_id, unsigned short v1) const;
       void SetChannelI1(unsigned short ch_id, unsigned short i1) const;
+      void EnableChannel(unsigned short ch_id) const;
+      void DisableChannel(unsigned short ch_id) const;
 
     private:
       /**
