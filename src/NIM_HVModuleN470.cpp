@@ -97,6 +97,30 @@ namespace NIM
   }
 
   void
+  HVModuleN470::EnableChannel(unsigned short ch_id) const
+  {
+    if (ch_id<0 or ch_id>=NUM_CHANNELS) throw Exception(__PRETTY_FUNCTION__, "Invalid channel id", JustWarning);
+    const HVModuleN470Opcodes opc = static_cast<HVModuleN470Opcodes>((unsigned short)(kN470ChannelOn&0xff)+(ch_id<<8));
+    try { WriteRegister(opc, 0x1); } catch (Exception& e) {
+      e.Dump();
+      std::ostringstream os; os << "Failed to enable channel " << ch_id;
+      throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+    }
+  }
+
+  void
+  HVModuleN470::DisableChannel(unsigned short ch_id) const
+  {
+    if (ch_id<0 or ch_id>=NUM_CHANNELS) throw Exception(__PRETTY_FUNCTION__, "Invalid channel id", JustWarning);
+    const HVModuleN470Opcodes opc = static_cast<HVModuleN470Opcodes>((unsigned short)(kN470ChannelOff&0xff)+(ch_id<<8));
+    try { WriteRegister(opc, 0x1); } catch (Exception& e) {
+      e.Dump();
+      std::ostringstream os; os << "Failed to disable channel " << ch_id;
+      throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+    }
+  }
+
+  void
   HVModuleN470::ReadRegister(const HVModuleN470Opcodes& reg, std::vector<uint16_t>* data, unsigned int num_words) const
   {
     try {
