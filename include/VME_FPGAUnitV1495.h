@@ -17,6 +17,8 @@ namespace VME
     kV1495Control           = 0x1020,
     kV1495TriggerSettings   = 0x1024,
     kV1495OutputSettings    = 0x1028,
+    kV1495ThresholdVoltage0 = 0x1028,
+    kV1495ThresholdVoltage1 = 0x1010,
     // CAEN board registers
     kV1495GeoAddress        = 0x8008,
     kV1495UserFPGAFlashMem  = 0x8014,
@@ -35,10 +37,16 @@ namespace VME
     kV1495HWRevision1       = 0x8148,
     kV1495HWRevision0       = 0x814c,
     kV1495SerNum0           = 0x8180,
-    kV1495SerNum1           = 0x8184,
-    kV1495ThresholdVoltage  = 0x8184
+    kV1495SerNum1           = 0x8184
   };
-
+  enum FPGAUnitV1495DACCH {
+    // User-defined registers
+    cH0     		    = 0,
+    cH1                     = 4096,
+    cH2                     = 8192,
+    cH3                     = 12288
+  };
+  const int OneVolt	    = 1634;
   /**
    * User-defined control word to be propagated to the
    * CAEN V1495 board firmware.
@@ -175,12 +183,12 @@ namespace VME
        * \brief Retrieve the threshold voltage
        * \return Threshold voltage (in units of 50 ns)
        */
-      uint32_t GetThresholdVoltage() const;
+      uint32_t GetThresholdVoltage(uint32_t tdc_number) const;
       /**
        * \brief Set the threshold voltage
        * \param[in] Threshold voltage (in units of 50 ns)
        */
-      void SetThresholdVoltage(uint32_t voltage) const;
+      void SetThresholdVoltage(uint32_t voltage, uint32_t tdc_number) const;
 
       uint32_t GetOutputPulser() const;
       void ClearOutputPulser() const;
