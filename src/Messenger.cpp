@@ -1,20 +1,18 @@
 #include "Messenger.h"
 
 Messenger::Messenger() :
-  Socket(-1), fWS(0), fNumAttempts(0), fPID(-1)
+  Socket(-1), fNumAttempts(0), fPID(-1)
 {}
 
 Messenger::Messenger(int port) :
-  Socket(port), fWS(0), fNumAttempts(0), fPID(-1)
+  Socket(port), fNumAttempts(0), fPID(-1)
 {
   std::cout << __PRETTY_FUNCTION__ << " new Messenger at port " << GetPort() << std::endl;
-  fWS = new WebSocket;
 }
 
 Messenger::~Messenger()
 {
   Disconnect();
-  if (fWS) delete fWS;
 }
 
 bool
@@ -51,20 +49,10 @@ Messenger::AddClient()
   try {
     AcceptConnections(s);
     Message message = FetchMessage(s.GetSocketId());
-    if (message.IsFromWeb()) {
-      // Feed the handshake to the WebSocket object
-      fWS->parseHandshake((unsigned char*)message.GetString().c_str(), message.GetString().size());
-      Send(Message(fWS->answerHandshake()), s.GetSocketId());
-      // From now on handle a WebSocket connection
-      SwitchClientType(s.GetSocketId(), WEBSOCKET_CLIENT);
-    }
-    else {
-      // if not a WebSocket connection
-      SocketMessage m(message);
-      if (m.GetKey()==ADD_CLIENT) {
-        SocketType type = static_cast<SocketType>(m.GetIntValue());
-        if (type!=CLIENT) SwitchClientType(s.GetSocketId(), type);
-      }
+    SocketMessage m(message);
+    if (m.GetKey()==ADD_CLIENT) {
+      SocketType type = static_cast<SocketType>(m.GetIntValue());
+      if (type!=CLIENT) SwitchClientType(s.GetSocketId(), type);
     }
     // Send the client's unique identifier
     Send(SocketMessage(SET_CLIENT_ID, s.GetSocketId()), s.GetSocketId());
@@ -82,26 +70,12 @@ Messenger::DisconnectClient(int sid, MessageKey key, bool force)
     return;
   }
   std::ostringstream o; o << "Disconnecting client # " << sid;
-  if (type==WEBSOCKET_CLIENT) o << " (web socket)";
   PrintInfo(o.str());
   
-  if (type==WEBSOCKET_CLIENT) {
-    try {
-      Send(SocketMessage(key, sid), sid);
-    } catch (Exception& e) {
-      e.Dump();
-      if (e.ErrorNumber()==10032 or force) {
-        fSocketsConnected.erase(std::pair<int,SocketType>(sid, type));
-        FD_CLR(sid, &fMaster);
-        return;
-      }
-    }
-  }
-  else {
-    Socket s;
-    s.SetSocketId(sid);
-    s.Stop();
-  }
+  Socket s;
+  s.SetSocketId(sid);
+  s.Stop();
+
   fSocketsConnected.erase(std::pair<int,SocketType>(sid, type));
   FD_CLR(sid, &fMaster);
 }
@@ -119,12 +93,7 @@ void
 Messenger::Send(const Message& m, int sid) const
 {
   try {
-    if (IsWebSocket(sid)) {
-      usleep(100000);
-      SendMessage(HTTPMessage(fWS, m, EncodeMessage), sid);
-      usleep(100000);
-    }
-    else SendMessage(m, sid);
+    SendMessage(m, sid);
   } catch (Exception& e) { e.Dump(); }
 }
 
@@ -156,11 +125,7 @@ Messenger::Receive()
       e.Dump();
       if (e.ErrorNumber()==11000) { DisconnectClient(s->first, THIS_CLIENT_DELETED); return; }
     }
-    if (s->second==WEBSOCKET_CLIENT) {
-      HTTPMessage h_msg(fWS, msg, DecodeMessage);
-      try { m = SocketMessage(h_msg); } catch (Exception& e) {;}
-    }
-    else m = SocketMessage(msg.GetString());
+    m = SocketMessage(msg.GetString());
     // Message was successfully decoded
     fNumAttempts = 0;
     
@@ -215,14 +180,12 @@ Messenger::ProcessMessage(SocketMessage m, int sid)
   else if (m.GetKey()==START_ACQUISITION) {
     try { StartAcquisition(); } catch (Exception& e) {
       e.Dump();
-      SendAll(WEBSOCKET_CLIENT, e);
       SendAll(DAQ, e);
     }
   }
   else if (m.GetKey()==STOP_ACQUISITION) {
     try { StopAcquisition(); } catch (Exception& e) {
       e.Dump();
-      SendAll(WEBSOCKET_CLIENT, e);
       SendAll(DAQ, e);
     }
   }
@@ -254,12 +217,10 @@ Messenger::ProcessMessage(SocketMessage m, int sid)
   else if (m.GetKey()==NEW_DQM_PLOT or m.GetKey()==UPDATED_DQM_PLOT) {
     try {
       SendAll(DAQ, m);
-      SendAll(WEBSOCKET_CLIENT, m);
     } catch (Exception& e) { e.Dump(); }
   }
   else if (m.GetKey()==EXCEPTION) {
     try {
-      SendAll(WEBSOCKET_CLIENT, m);
       SendAll(DAQ, m);
       std::cout << "--> " << m.GetValue() << std::endl;
     } catch (Exception& e) { e.Dump(); }
@@ -306,7 +267,6 @@ Messenger::StartAcquisition()
       default:
         break;
     }
-    SendAll(WEBSOCKET_CLIENT, SocketMessage(ACQUISITION_STARTED));
     SendAll(DAQ, SocketMessage(ACQUISITION_STARTED));
     
     // Send the run number to DQMonitors
@@ -329,7 +289,6 @@ Messenger::StopAcquisition()
        << "Return value: " << ret << " (errno=" << errno << ")";
     throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
   }
-  SendAll(WEBSOCKET_CLIENT, SocketMessage(ACQUISITION_STOPPED));
   SendAll(DAQ, SocketMessage(ACQUISITION_STOPPED));
   throw Exception(__PRETTY_FUNCTION__, "Acquisition stop signal sent!", Info, 30001);
 }
