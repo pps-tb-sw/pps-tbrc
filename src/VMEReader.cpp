@@ -48,7 +48,7 @@ VMEReader::ReadXML(const char* filename)
       if (fOnSocket) Client::Send(Exception(__PRETTY_FUNCTION__, os.str(), Info));
     }
   }
-  if (tinyxml2::XMLElement* afpga=doc.FirstChildElement("fpga")) {
+  for (tinyxml2::XMLElement* afpga=doc.FirstChildElement("fpga"); afpga!=NULL; afpga=afpga->NextSiblingElement("fpga")) {
     if (const char* address=afpga->Attribute("address")) {
       unsigned long addr = static_cast<unsigned long>(strtol(address, NULL, 0));
       if (!addr) throw Exception(__PRETTY_FUNCTION__, "Failed to parse FPGA's base address", Fatal);
