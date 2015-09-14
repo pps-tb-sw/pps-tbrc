@@ -56,7 +56,7 @@ VMEReader::ReadXML(const char* filename)
         try { AddFPGAUnit(addr); } catch (Exception& e) { if (fOnSocket) Client::Send(e); }
         VME::FPGAUnitV1495* fpga = GetFPGAUnit(addr);
         if (const char* type=afpga->Attribute("type")) {
-          if (!strcmp(type, "tdc_fanout")) fpga->SetTDCControlFanout(true);
+          if (strcmp(type, "tdc_fanout")==0) fpga->SetTDCControlFanout(true);
         }
         VME::FPGAUnitV1495Control control = fpga->GetControl();
         if (tinyxml2::XMLElement* clock=afpga->FirstChildElement("clock")) {
@@ -108,6 +108,7 @@ VMEReader::ReadXML(const char* filename)
             control.SetTriggeringMode(VME::FPGAUnitV1495Control::TriggerMatching); break;
         }
         fpga->SetControl(control);
+        fpga->DumpFWInformation();
       } catch (Exception& e) { e.Dump(); if (fOnSocket) Client::Send(e); throw e; }
     }
     else throw Exception(__PRETTY_FUNCTION__, "Failed to extract FPGA's base address", Fatal);

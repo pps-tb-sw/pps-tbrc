@@ -91,15 +91,17 @@ int main(int argc, char *argv[]) {
   
     static const unsigned int num_tdc = vme->GetNumTDC();
     
-    VME::FPGAUnitCollection fpgas = vme->GetFPGAUnitCollection(); VME::FPGAUnitV1495* fpga;
+    VME::FPGAUnitCollection fpgas = vme->GetFPGAUnitCollection(); VME::FPGAUnitV1495* fpga = 0;
     for (VME::FPGAUnitCollection::iterator afpga=fpgas.begin(); afpga!=fpgas.end(); afpga++) {
       if (afpga->second->IsTDCControlFanout()) { fpga = afpga->second; break; }
     }
     const bool use_fpga = (fpga!=0);
     if (!use_fpga) {
       std::ostringstream os;
-      os << "Trying to launch the acquisition with a configuration\n\t"
-         << "in which no FPGA board provide control lines fanout to HPTDCs";
+      os << "Trying to launch the acquisition with a\n\t"
+         << "configuration in which no FPGA board provide\n\t"
+         << "control lines fanout to HPTDCs!\n\t\n\t"
+         << "Please check your config.xml file... Aborting!";
       throw Exception(__PRETTY_FUNCTION__, os.str(), Fatal);
       exit(0);
     }
