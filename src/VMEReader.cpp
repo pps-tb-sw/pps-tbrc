@@ -1,7 +1,7 @@
 #include "VMEReader.h"
 
 VMEReader::VMEReader(const char *device, VME::BridgeType type, bool on_socket) :
-  Client(1987), fBridge(0), fSG(0), fFPGA(0), fCAENET(0), fHV(0),
+  Client(1987), fBridge(0), fSG(0), fCAENET(0), fHV(0),
   fOnSocket(on_socket), fIsPulserStarted(false)
 {
   try {
@@ -20,7 +20,6 @@ VMEReader::~VMEReader()
     Client::Disconnect();
   }
   if (fSG) delete fSG;
-  if (fFPGA) delete fFPGA;
   if (fIsPulserStarted) fBridge->StopPulser();
   if (fBridge) delete fBridge;
   if (fHV) delete fHV;
@@ -40,8 +39,8 @@ VMEReader::ReadXML(const char* filename)
        << doc.GetErrorStr1();
     throw Exception(__PRETTY_FUNCTION__, os.str(), Fatal);
   }
-  if (tinyxml2::XMLElement* fpga=doc.FirstChildElement("triggering")) {
-    if (const char* mode=fpga->Attribute("mode")) {
+  if (tinyxml2::XMLElement* atrig=doc.FirstChildElement("triggering")) {
+    if (const char* mode=atrig->Attribute("mode")) {
       std::ostringstream os; os << "Triggering mode: ";
       if (!strcmp(mode,"continuous_storage")) { fGlobalAcqMode = ContinuousStorage; os << "Continuous storage (manual)"; }
       if (!strcmp(mode,"trigger_start"))      { fGlobalAcqMode = TriggerStart; os << "Continuous storage (trigger on start)"; }
@@ -49,52 +48,56 @@ VMEReader::ReadXML(const char* filename)
       if (fOnSocket) Client::Send(Exception(__PRETTY_FUNCTION__, os.str(), Info));
     }
   }
-  if (tinyxml2::XMLElement* fpga=doc.FirstChildElement("fpga")) {
-    if (const char* address=fpga->Attribute("address")) {
+  if (tinyxml2::XMLElement* afpga=doc.FirstChildElement("fpga")) {
+    if (const char* address=afpga->Attribute("address")) {
       unsigned long addr = static_cast<unsigned long>(strtol(address, NULL, 0));
       if (!addr) throw Exception(__PRETTY_FUNCTION__, "Failed to parse FPGA's base address", Fatal);
       try {
         try { AddFPGAUnit(addr); } catch (Exception& e) { if (fOnSocket) Client::Send(e); }
-        VME::FPGAUnitV1495Control control = fFPGA->GetControl();
-        if (tinyxml2::XMLElement* clock=fpga->FirstChildElement("clock")) {
+        VME::FPGAUnitV1495* fpga = GetFPGAUnit(addr);
+        if (const char* type=afpga->Attribute("type")) {
+          if (!strcmp(type, "tdc_fanout")) fpga->SetTDCControlFanout(true);
+        }
+        VME::FPGAUnitV1495Control control = fpga->GetControl();
+        if (tinyxml2::XMLElement* clock=afpga->FirstChildElement("clock")) {
           if (tinyxml2::XMLElement* source=clock->FirstChildElement("source")) {
             if (!strcmp(source->GetText(),"internal")) control.SetClockSource(VME::FPGAUnitV1495Control::InternalClock);
             if (!strcmp(source->GetText(),"external")) control.SetClockSource(VME::FPGAUnitV1495Control::ExternalClock);
           }
           if (tinyxml2::XMLElement* period=clock->FirstChildElement("period")) {
-            fFPGA->SetInternalClockPeriod(atoi(period->GetText()));
+            fpga->SetInternalClockPeriod(atoi(period->GetText()));
           }
         }
-        if (tinyxml2::XMLElement* trig=fpga->FirstChildElement("trigger")) {
+        if (tinyxml2::XMLElement* trig=afpga->FirstChildElement("trigger")) {
           if (tinyxml2::XMLElement* source=trig->FirstChildElement("source")) {
             if (!strcmp(source->GetText(),"internal")) control.SetTriggerSource(VME::FPGAUnitV1495Control::InternalTrigger);
             if (!strcmp(source->GetText(),"external")) control.SetTriggerSource(VME::FPGAUnitV1495Control::ExternalTrigger);
           }
           if (tinyxml2::XMLElement* period=trig->FirstChildElement("period")) {
-            fFPGA->SetInternalTriggerPeriod(atoi(period->GetText()));
+            fpga->SetInternalTriggerPeriod(atoi(period->GetText()));
           }
         }
-        if (tinyxml2::XMLElement* sig=fpga->FirstChildElement("signal")) {
+        if (tinyxml2::XMLElement* sig=afpga->FirstChildElement("signal")) {
           if (tinyxml2::XMLElement* source=sig->FirstChildElement("source")) {
             if (!strcmp(source->GetText(),"internal")) for (unsigned int i=0; i<2; i++) control.SetSignalSource(i, VME::FPGAUnitV1495Control::InternalSignal);
             if (!strcmp(source->GetText(),"external")) for (unsigned int i=0; i<2; i++) control.SetSignalSource(i, VME::FPGAUnitV1495Control::ExternalSignal);
           }
           if (tinyxml2::XMLElement* poi=sig->FirstChildElement("poi")) {
-            fFPGA->SetOutputPulserPOI(atoi(poi->GetText()));
+            fpga->SetOutputPulserPOI(atoi(poi->GetText()));
           }
         }
-	if (tinyxml2::XMLElement* vth=fpga->FirstChildElement("threshold")) {
+	if (tinyxml2::XMLElement* vth=afpga->FirstChildElement("threshold")) {
           if (tinyxml2::XMLElement* tdc0=vth->FirstChildElement("tdc0")) {
-            fFPGA->SetThresholdVoltage(atoi(tdc0->GetText()), 0);
+            fpga->SetThresholdVoltage(atoi(tdc0->GetText()), 0);
           }
           if (tinyxml2::XMLElement* tdc1=vth->FirstChildElement("tdc1")) {
-            fFPGA->SetThresholdVoltage(atoi(tdc1->GetText()), 1);
+            fpga->SetThresholdVoltage(atoi(tdc1->GetText()), 1);
           }
           if (tinyxml2::XMLElement* tdc2=vth->FirstChildElement("tdc2")) {
-            fFPGA->SetThresholdVoltage(atoi(tdc2->GetText()), 2);
+            fpga->SetThresholdVoltage(atoi(tdc2->GetText()), 2);
           }
           if (tinyxml2::XMLElement* tdc3=vth->FirstChildElement("tdc3")) {
-            fFPGA->SetThresholdVoltage(atoi(tdc3->GetText()), 3);
+            fpga->SetThresholdVoltage(atoi(tdc3->GetText()), 3);
           }
         }
         switch (fGlobalAcqMode) {
@@ -104,7 +107,7 @@ VMEReader::ReadXML(const char* filename)
           case TriggerMatching:
             control.SetTriggeringMode(VME::FPGAUnitV1495Control::TriggerMatching); break;
         }
-        fFPGA->SetControl(control);
+        fpga->SetControl(control);
       } catch (Exception& e) { e.Dump(); if (fOnSocket) Client::Send(e); throw e; }
     }
     else throw Exception(__PRETTY_FUNCTION__, "Failed to extract FPGA's base address", Fatal);
@@ -264,7 +267,10 @@ VMEReader::AddFPGAUnit(uint32_t address)
 {
   if (!fBridge) throw Exception(__PRETTY_FUNCTION__, "No bridge detected! Aborting...", Fatal);
   try {
-    fFPGA = new VME::FPGAUnitV1495(fBridge->GetHandle(), address);
+    fFPGACollection.insert(std::pair<uint32_t,VME::FPGAUnitV1495*>(
+      address,
+      new VME::FPGAUnitV1495(fBridge->GetHandle(), address)
+    ));
   } catch (Exception& e) {
     e.Dump();
     if (fOnSocket) Client::Send(e);

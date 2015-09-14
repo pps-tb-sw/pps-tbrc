@@ -3,7 +3,7 @@
 namespace VME
 {
   FPGAUnitV1495::FPGAUnitV1495(int32_t bhandle, uint32_t baseaddr) :
-    GenericBoard<FPGAUnitV1495Register,cvA32_U_DATA>(bhandle, baseaddr)
+    GenericBoard<FPGAUnitV1495Register,cvA32_U_DATA>(bhandle, baseaddr), fIsTDCControlFanout(false)
   {
     try {
       CheckBoardVersion();
@@ -40,6 +40,7 @@ namespace VME
     std::ostringstream os;
     os << "User Firmware information" << "\n\t"
        << "FW revision: " << std::dec << ((ufwrev>>8)&0xff) << "." << (ufwrev&0xff) << "\n\t"
+       << "Used as a TDC control lines fanout? " << IsTDCControlFanout() << "\n\t"
        << "Clock source:   ";
     switch (control.GetClockSource()) {
       case FPGAUnitV1495Control::ExternalClock: os << "external"; break;

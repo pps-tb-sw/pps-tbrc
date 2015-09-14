@@ -10,7 +10,7 @@
     <tdc3>80</tdc3>
   </threshold>
 </fpga>
-<fpga address="0x42100000">
+<fpga address="0x42100000" type="tdc_fanout">
   <clock>
     <source>internal</source>
     <period>1</period>

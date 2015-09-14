@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
 
   vme = new VMEReader("/dev/a2818_0", VME::CAEN_V2718, with_socket);
   try { vme->AddFPGAUnit(address); } catch (Exception& e) { e.Dump(); }
-  VME::FPGAUnitV1495* fpga = vme->GetFPGAUnit();
+  VME::FPGAUnitV1495* fpga = vme->GetFPGAUnit(address);
   const bool use_fpga = (fpga!=0);
 
   uint32_t Vth = 10;
