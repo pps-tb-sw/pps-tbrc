@@ -25,7 +25,7 @@ namespace VME
        << "Geo address: 0x" << std::hex << GetGeoAddress();
     PrintInfo(os.str());
     GetControl();
-    DumpFWInformation();
+    //DumpFWInformation();
   }
 
   FPGAUnitV1495::~FPGAUnitV1495()
@@ -40,21 +40,24 @@ namespace VME
     std::ostringstream os;
     os << "User Firmware information" << "\n\t"
        << "FW revision: " << std::dec << ((ufwrev>>8)&0xff) << "." << (ufwrev&0xff) << "\n\t"
-       << "Used as a TDC control lines fanout? " << IsTDCControlFanout() << "\n\t"
-       << "Clock source:   ";
-    switch (control.GetClockSource()) {
-      case FPGAUnitV1495Control::ExternalClock: os << "external"; break;
-      case FPGAUnitV1495Control::InternalClock:
-        os << "internal (period: " << (std::max(GetInternalClockPeriod(),(uint32_t)1)*25) << " ns)"; break;
-      default: os << "invalid (" << control.GetClockSource() << ")"; break;
-    }
-    os << "\n\t"
-       << "Trigger source: ";
-    switch (control.GetTriggerSource()) {
-      case FPGAUnitV1495Control::ExternalTrigger: os << "external"; break;
-      case FPGAUnitV1495Control::InternalTrigger:
-        os << "internal (period: " << (std::max(GetInternalTriggerPeriod(),(uint32_t)1)*25/1e6) << " ms)"; break;
-      default: os << "invalid (" << control.GetTriggerSource() << ")"; break;
+       << "Used as a TDC control lines fanout? " << IsTDCControlFanout();
+    if (IsTDCControlFanout()) {
+      os << "\n\t"
+         << "Clock source:   ";
+      switch (control.GetClockSource()) {
+        case FPGAUnitV1495Control::ExternalClock: os << "external"; break;
+        case FPGAUnitV1495Control::InternalClock:
+          os << "internal (period: " << (std::max(GetInternalClockPeriod(),(uint32_t)1)*25) << " ns)"; break;
+        default: os << "invalid (" << control.GetClockSource() << ")"; break;
+      }
+      os << "\n\t"
+         << "Trigger source: ";
+      switch (control.GetTriggerSource()) {
+        case FPGAUnitV1495Control::ExternalTrigger: os << "external"; break;
+        case FPGAUnitV1495Control::InternalTrigger:
+          os << "internal (period: " << (std::max(GetInternalTriggerPeriod(),(uint32_t)1)*25/1e6) << " ms)"; break;
+        default: os << "invalid (" << control.GetTriggerSource() << ")"; break;
+      }
     }
     PrintInfo(os.str());
   }
