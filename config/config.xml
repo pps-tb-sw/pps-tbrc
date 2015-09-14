@@ -1,15 +1,23 @@
 <?xml version="1.0"?>
-<!--<triggering mode="continuous_storage" />-->
+<triggering mode="continuous_storage" />
 <!--<triggering mode="trigger_start" />-->
-<triggering mode="trigger_matching" />
-<fpga address="0x00ee0000">
+<!--<triggering mode="trigger_matching" />-->
+<fpga address="0x32100000">
+  <threshold>
+    <tdc0>80</tdc0>
+    <tdc1>80</tdc1>
+    <tdc2>80</tdc2>
+    <tdc3>80</tdc3>
+  </threshold>
+</fpga>
+<fpga address="0x42100000">
   <clock>
     <source>internal</source>
     <period>1</period>
   </clock>
   <trigger>
-    <source>external</source>
-    <period>1</period>
+    <source>internal</source>
+    <period>1000000</period>
   </trigger>
   <signal>
     <source>internal</source>
@@ -37,21 +45,6 @@
     <width>400</width>
     <offset>-400</offset>
   </trigger_window>
-</tdc>
-<tdc address="0x00cc0000">
-  <detector>gstof1+reference</detector>
-  <verbosity>1</verbosity>
-  <det_mode>trailead</det_mode>
-  <dll>PLL_High_Resolution</dll>
-  <ettt/>
-  <trigger_window>
-    <width>400</width>
-    <offset>-400</offset>
-  </trigger_window>
-  <poi>
-    <group0>3</group0>
-    <group1>0</group1>
-  </poi>
 </tdc>
 <cfd address="0x00070000">
   <poi>3</poi>

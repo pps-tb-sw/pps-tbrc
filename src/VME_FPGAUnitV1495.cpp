@@ -377,11 +377,14 @@ namespace VME
   }
 
  uint32_t
-  FPGAUnitV1495::GetThresholdVoltage() const
+  FPGAUnitV1495::GetThresholdVoltage(uint32_t tdc_number) const
   {
     uint32_t voltage = 0x0;
     sleep(1);
-    try { ReadRegister(kV1495ThresholdVoltage, &voltage); } catch (Exception& e) {
+    try {if (tdc_number < 2)
+          ReadRegister(kV1495ThresholdVoltage0, &voltage);
+      else
+          ReadRegister(kV1495ThresholdVoltage1, &voltage); } catch (Exception& e) {
       e.Dump();
       throw Exception(__PRETTY_FUNCTION__, "Failed to retrieve the threshold voltage from FW", JustWarning);
     }
@@ -389,10 +392,62 @@ namespace VME
   }
 
   void
-  FPGAUnitV1495::SetThresholdVoltage(uint32_t voltage) const
+  FPGAUnitV1495::SetThresholdVoltage(uint32_t voltage, uint32_t tdc_number) const
   {
+    voltage = voltage % 1024; 	// DAC threshold voltage is difference between two 12-bit numbers
+    uint32_t oldvoltage = 0x0;
+    uint32_t digitalValue = 0x0;
     sleep(1);
-    try { WriteRegister(kV1495ThresholdVoltage, voltage); } catch (Exception& e) {
+    try { 
+      if (tdc_number < 2)
+         ReadRegister(kV1495ThresholdVoltage0, &oldvoltage);
+      else
+         ReadRegister(kV1495ThresholdVoltage1, &oldvoltage);
+      if (tdc_number == 0){
+	 WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + OneVolt);
+         sleep(1);
+         digitalValue = (uint32_t) (1.758683*voltage-15.74276+0.5);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + digitalValue);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH2 + OneVolt);
+         sleep(1);
+         digitalValue = (uint32_t) (1.753127*voltage-15.45482+0.5);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + digitalValue);
+      }
+      if (tdc_number == 1){
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * OneVolt);
+         sleep(1);
+         digitalValue = (uint32_t) (1.758683*voltage-15.74276+0.5);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + digitalValue));
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH2 + OneVolt));
+         sleep(1);
+         digitalValue = (uint32_t) (1.753127*voltage-15.45482+0.5);
+         WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + digitalValue));
+      }
+      if (tdc_number == 2){
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + OneVolt);
+         sleep(1);
+         digitalValue = (uint32_t) (1.70261*voltage-30.023+0.5);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + digitalValue);
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH2 + OneVolt);
+         sleep(1);
+         digitalValue = (uint32_t) (1.712739*voltage-3.96861+0.5);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + digitalValue);
+      }
+      if (tdc_number == 3){
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * OneVolt);
+         sleep(1);
+         digitalValue = (uint32_t) (1.703834*voltage-0.54032+0.5);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH1 + OneVolt + digitalValue));
+         sleep(1);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH2 + OneVolt));
+         sleep(1);
+         digitalValue = (uint32_t) (1.702613*voltage+20.28103+0.5);
+         WriteRegister(kV1495ThresholdVoltage1, (oldvoltage & 0x0000FFFF) + 0x00010000 * (cH3 + OneVolt + digitalValue));
+      }
+    } catch (Exception& e) {
       e.Dump();
       throw Exception(__PRETTY_FUNCTION__, "Failed to set the threshold voltage to FW", JustWarning);
     }
