@@ -3,6 +3,7 @@
 
 #include "VME_GenericBoard.h"
 
+#include <map>
 #include <unistd.h>
 
 namespace VME
@@ -205,10 +206,19 @@ namespace VME
       //void PauseScaler() const;
       /// Return the inner triggers counter value
       uint32_t GetScalerValue() const;
+      
+      /// Is this FPGA board used as a mean to propagate the control signal to HPTDCs?
+      inline void SetTDCControlFanout(bool sw=true) { fIsTDCControlFanout = sw; }
+      /// Is this FPGA board used as a mean to propagate the control signal to HPTDCs?
+      inline bool IsTDCControlFanout() const { return fIsTDCControlFanout; }
  
     private:
       bool fScalerStarted;
+      bool fIsTDCControlFanout;
   };
+
+  /// Mapper from physical VME addresses to pointers to FPGA objects
+  typedef std::map<uint32_t,VME::FPGAUnitV1495*> FPGAUnitCollection;
 }
 
 #endif

@@ -84,7 +84,11 @@ class VMEReader : public Client
      */
     void AddFPGAUnit(uint32_t address);
     /// Return the pointer to the FPGA board connected to this controller (if any ; 0 otherwise)
-    inline VME::FPGAUnitV1495* GetFPGAUnit() { return fFPGA; }
+    inline VME::FPGAUnitV1495* GetFPGAUnit(uint32_t address) {
+      if (fFPGACollection.count(address)==0) return 0;
+      return fFPGACollection[address];
+    }
+    inline VME::FPGAUnitCollection GetFPGAUnitCollection() { return fFPGACollection; }
 
     void NewRun() const;
     inline void NewBurst() const {
@@ -120,7 +124,8 @@ class VMEReader : public Client
       } catch (Exception& e) { e.Dump(); }
     }
     /// Send a clear signal to both the TDC boards
-    inline void SendClear() const {
+    inline void SendClear(uint32_t addr) {
+      VME::FPGAUnitV1495* fFPGA = GetFPGAUnit(addr);
       if (!fFPGA) return;
       try {
         fFPGA->PulseTDCBits(VME::FPGAUnitV1495::kClear);
@@ -162,7 +167,7 @@ class VMEReader : public Client
     /// Pointer to the VME input/output module object
     VME::IOModuleV262* fSG;
     /// Pointer to the VME general purpose FPGA unit object
-    VME::FPGAUnitV1495* fFPGA;
+    VME::FPGAUnitCollection fFPGACollection;
     /// Pointer to the VME CAENET controller
     VME::CAENETControllerV288* fCAENET;
     /// Pointer to the NIM high voltage module (passing through the CAENET controller)
