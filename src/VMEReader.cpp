@@ -94,7 +94,7 @@ VMEReader::ReadXML(const char* filename)
             fFPGA->SetThresholdVoltage(atoi(tdc2->GetText()), 2);
           }
           if (tinyxml2::XMLElement* tdc3=vth->FirstChildElement("tdc3")) {
-            fFPGA->SetThresholdVoltage(atoi(tdc2->GetText()), 3);
+            fFPGA->SetThresholdVoltage(atoi(tdc3->GetText()), 3);
           }
         }
         switch (fGlobalAcqMode) {
