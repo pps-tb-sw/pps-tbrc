@@ -33,7 +33,7 @@ VMEReader::ReadXML(const char* filename)
   doc.LoadFile(filename);
   if (doc.Error()) {
     std::ostringstream os;
-    os << "Error while trying to parse the configuration file" << "\n\t"
+    os << "Error while trying to parse the configuration file \"" << filename << "\"" << "\n\t"
        << "Code: " << doc.ErrorID() << "\n\t"
        << "Dump of error:" << "\n"
        << doc.GetErrorStr1();

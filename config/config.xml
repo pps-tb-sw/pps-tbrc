@@ -1,8 +1,22 @@
 <?xml version="1.0"?>
-<triggering mode="continuous_storage" />
+<!--<triggering mode="continuous_storage" />-->
 <!--<triggering mode="trigger_start" />-->
-<!--<triggering mode="trigger_matching" />-->
-<fpga address="0x32100000">
+<triggering mode="trigger_matching" />
+<fpga address="0x32100000" type="tdc_fanout">
+  <clock>
+    <source>internal</source>
+    <period>1</period>
+  </clock>
+  <trigger>
+    <source>external</source>
+    <period>1000000</period>
+  </trigger>
+  <signal>
+    <source>internal</source>
+    <poi>4294967295</poi>
+  </signal>
+<!--</fpga>
+<fpga address="0x42100000" type="tdc_fanout">-->
   <threshold>
     <tdc0>80</tdc0>
     <tdc1>80</tdc1>
@@ -10,22 +24,8 @@
     <tdc3>80</tdc3>
   </threshold>
 </fpga>
-<fpga address="0x42100000" type="tdc_fanout">
-  <clock>
-    <source>internal</source>
-    <period>1</period>
-  </clock>
-  <trigger>
-    <source>internal</source>
-    <period>1000000</period>
-  </trigger>
-  <signal>
-    <source>internal</source>
-    <poi>4294967295</poi>
-  </signal>
-</fpga>
 <tdc address="0x00aa0000">
-  <detector>gastof</detector>
+  <detector>quartic_1</detector>
   <verbosity>1</verbosity>
   <det_mode>trailead</det_mode>
   <dll>PLL_High_Resolution</dll>
@@ -37,6 +37,17 @@
 </tdc>
 <tdc address="0x00bb0000">
   <detector>quartic_2</detector>
+  <verbosity>1</verbosity>
+  <det_mode>trailead</det_mode>
+  <dll>PLL_High_Resolution</dll>
+  <ettt/>
+  <trigger_window>
+    <width>400</width>
+    <offset>-400</offset>
+  </trigger_window>
+</tdc>
+<tdc address="0x00cc0000">
+  <detector>timingref</detector>
   <verbosity>1</verbosity>
   <det_mode>trailead</det_mode>
   <dll>PLL_High_Resolution</dll>

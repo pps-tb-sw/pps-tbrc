@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   string xml_config;
   if (argc<2) {
     cout << "No configuration file provided! using default config/config.xml" << endl;
-    xml_config = "config/config.xml";
+    xml_config = string(getenv("PPS_PATH"))+"/config/config.xml";
   }
   else xml_config = argv[1];
 
