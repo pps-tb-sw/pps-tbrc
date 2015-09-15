@@ -205,9 +205,9 @@ int main(int argc, char *argv[]) {
           for (VME::TDCEventCollection::const_iterator e=ec.begin(); e!=ec.end(); e++) {
             word = e->GetWord();
             out_file[i].write((char*)&word, sizeof(uint32_t));
-            cout << dec << "board" << i << ": " << hex << e->GetType() << "\t";
+            /*cout << dec << "board" << i << ": " << hex << e->GetType() << "\t";
             if (e->GetType()==VME::TDCEvent::TDCMeasurement) cout << e->GetChannelId();
-            cout << endl;
+            cout << endl;*/
             //e->Dump();
             //if (e->GetType()==VME::TDCEvent::TDCMeasurement) cout << "----> (board " << dec << i << " with address " << hex << atdc->first << dec << ") new event on channel " << e->GetChannelId() << endl;
           }
