@@ -386,8 +386,10 @@ class DQMReader:
         outputtextfilehandle.close()
 
 if __name__ == '__main__':
-    reader = DQMReader("../../timing_data/events_285_2_1439153730_board1.dat")
-#    reader.SetVerbosity(1)
+    filename = '../../timing_data/events_439_16_1442319858_board2.dat'
+    if len(sys.argv)>1: filename = sys.argv[1]
+    reader = DQMReader(filename)
+    reader.SetVerbosity(1)
     reader.ProcessBinaryFile()
 #    reader.ReadFile()
 
