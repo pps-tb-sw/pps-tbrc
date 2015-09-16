@@ -128,7 +128,6 @@ FileReader::GetNextMeasurement(unsigned int channel_id, VME::TDCMeasurement* mc)
     bool has_error = false;
     while (true) {
       if (!GetNextEvent(&ev)) return false;
-      
       //ev.Dump();
       /*std::cout << "0x" << std::hex << ev.GetType();
       if (ev.GetType()==VME::TDCEvent::TDCMeasurement) {
@@ -146,14 +145,14 @@ FileReader::GetNextMeasurement(unsigned int channel_id, VME::TDCMeasurement* mc)
 
       if (ev.GetType()==VME::TDCEvent::GlobalTrailer) break;
     }
-    if (has_error) throw Exception(__PRETTY_FUNCTION__, "Measurement has at least one error word.", JustWarning, 41000);
+    //if (has_error) throw Exception(__PRETTY_FUNCTION__, "Measurement has at least one error word.", JustWarning, 41000);
   }
   else {
     std::ostringstream os;
     os << "Unrecognized readout/acquisition mode: " << fReadoutMode;
     throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning, 40004);
   }
-  mc->SetEventsCollection(ec);
+  try { mc->SetEventsCollection(ec); } catch (Exception& e) { e.Dump(); }
   return true;
 }
 

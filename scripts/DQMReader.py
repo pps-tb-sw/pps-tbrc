@@ -386,7 +386,7 @@ class DQMReader:
         outputtextfilehandle.close()
 
 if __name__ == '__main__':
-    filename = '../../timing_data/events_439_16_1442319858_board2.dat'
+    filename = '/home/ppstb/timing_data/events_451_0_1442384408_board3.dat'
     if len(sys.argv)>1: filename = sys.argv[1]
     reader = DQMReader(filename)
     reader.SetVerbosity(1)

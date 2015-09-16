@@ -55,6 +55,10 @@
   <verbosity>1</verbosity>
   <det_mode>trailead</det_mode>
   <dll>PLL_High_Resolution</dll>
+  <poi>
+    <group0>1</group0>
+    <group1>0</group1>
+  </poi>
   <ettt/>
   <trigger_window>
     <width>400</width>

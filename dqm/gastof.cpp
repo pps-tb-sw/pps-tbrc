@@ -37,8 +37,7 @@ cout << "filename: " << filename << endl;
     num_events[i] = 0;
     trigger_td = 0;
     try {
-      if (i<32) { nino_board = 1; ch_id = i; }
-      else      { nino_board = 0; ch_id = i-32; }
+      nino_board = 1; ch_id = i;
       while (true) {
         if (!reader.GetNextMeasurement(i, &m)) break;
         //if (trigger_td!=0) { canv[kTriggerTimeDiff]->FillChannel(nino_board, ch_id, (m.GetLeadingTime(0)-trigger_td)*25./1.e3); }
@@ -76,7 +75,13 @@ cout << "filename: " << filename << endl;
 int
 main(int argc, char* argv[])
 {
-  DQM::DQMProcess dqm(1987, 1, "gastof");
-  dqm.Run(GastofDQM);
+  if (argc==1) {
+    DQM::DQMProcess dqm(1987, 1, "gastof");
+    dqm.Run(GastofDQM);
+  }
+  else {
+    vector<string> out;
+    GastofDQM(0, argv[1], &out);
+  }
   return 0;
 }
