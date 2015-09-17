@@ -29,6 +29,15 @@ namespace VME
     public:
       inline ScalerV8x0Status(unsigned int word): fWord(word) {;}
       inline ~ScalerV8x0Status() {;}
+
+      inline bool DataReady() const { return fWord&0x1; }
+      inline bool AlmostFull() const { return (fWord>>1)&0x1; }
+      inline bool Full() const { return (fWord>>2)&0x1; }
+      inline bool GlobalDataReady() const { return (fWord>>3)&0x1; }
+      inline bool GlobalBusy() const { return (fWord>>4)&0x1; }
+      inline bool TermOn() const { return (fWord>>5)&0x1; }
+      inline bool TermOff() const { return (fWord>>6)&0x1; }
+      inline bool BusError() const { return (fWord>>7)&0x1; }
     private:
       unsigned int fWord;
   };
@@ -48,6 +57,10 @@ namespace VME
       
       void SetPOI(unsigned int poi) const;
       unsigned int GetPOI() const;
+
+      ScalerV8x0Status GetStatus() const;
+      ScalerV8x0Control GetControl() const;
+      void SetControl(const ScalerV8x0Control& control) const;
     private:
 
   };
