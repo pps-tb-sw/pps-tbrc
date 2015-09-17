@@ -16,6 +16,22 @@ namespace VME
     kV8x0SerialMSB     = 0x4f02,
     kV8x0SerialLSB     = 0x4f06
   };
+  class ScalerV8x0Control
+  {
+    public:
+      inline ScalerV8x0Control(unsigned int word): fWord(word) {;}
+      inline ~ScalerV8x0Control() {;}
+    private:
+      unsigned int fWord;
+  };
+  class ScalerV8x0Status
+  {
+    public:
+      inline ScalerV8x0Status(unsigned int word): fWord(word) {;}
+      inline ~ScalerV8x0Status() {;}
+    private:
+      unsigned int fWord;
+  };
   class ScalerV8x0 : public GenericBoard<ScalerV8x0Register,cvA24_U_DATA>
   {
     public:
