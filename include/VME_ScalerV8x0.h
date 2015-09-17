@@ -6,6 +6,7 @@
 namespace VME
 {
   enum ScalerV8x0Register {
+    kV8x0ChannelValue  = 0x1000,
     kV8x0ChannelEnable = 0x1100,
     kV8x0Control       = 0x1108,
     kV8x0FWVersion     = 0x1132,
@@ -27,6 +28,10 @@ namespace VME
       unsigned short GetManufacturerId() const;
       //unsigned short GetIdentifier() const;
 
+      unsigned int GetChannelValue(unsigned short channel_id) const;
+      
+      void SetPOI(unsigned int poi) const;
+      unsigned int GetPOI() const;
     private:
 
   };

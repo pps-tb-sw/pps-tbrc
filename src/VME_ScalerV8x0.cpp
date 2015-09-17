@@ -70,4 +70,36 @@ namespace VME
     } catch (Exception& e) { e.Dump(); }
     return 0;
     }*/
+
+  unsigned int
+  ScalerV8x0::GetChannelValue(unsigned short channel_id) const
+  {
+    uint32_t word;
+    ScalerV8x0Register reg = static_cast<ScalerV8x0Register>(kV8x0ChannelValue+(channel_id*4));
+    try {
+      ReadRegister(reg, &word);
+      return static_cast<unsigned int>(word);
+    } catch (Exception& e) { e.Dump(); }
+    return 0;
+  }
+
+  void
+  ScalerV8x0::SetPOI(unsigned int poi) const
+  {
+    try {
+      WriteRegister(kV8x0ChannelEnable, poi);
+    } catch (Exception& e) { e.Dump(); }
+  }
+
+  unsigned int
+  ScalerV8x0::GetPOI() const
+  {
+    uint32_t word;
+    try {
+      ReadRegister(kV8x0ChannelEnable, &word);
+      return static_cast<unsigned int>(word);
+    } catch (Exception& e) { e.Dump(); }
+    return 0;
+  }
+  
 }
