@@ -101,5 +101,34 @@ namespace VME
     } catch (Exception& e) { e.Dump(); }
     return 0;
   }
+
+  ScalerV8x0Status
+  ScalerV8x0::GetStatus() const
+  {
+    uint16_t word;
+    try {
+      ReadRegister(kV8x0Status, &word);
+      return ScalerV8x0Status(word);
+    } catch (Exception& e) { e.Dump(); }
+    return 0;
+  }
   
+  ScalerV8x0Control
+  ScalerV8x0::GetControl() const
+  {
+    uint16_t word;
+    try {
+      ReadRegister(kV8x0Control, &word);
+      return ScalerV8x0Control(word);
+    } catch (Exception& e) { e.Dump(); }
+    return 0;
+  }
+  
+  void
+  ScalerV8x0::SetControl(const ScalerV8x0Control& control) const
+  {
+    try {
+      WriteRegister(kV8x0Control, control.GetWord());
+    } catch (Exception& e) { e.Dump(); }
+  }
 }
