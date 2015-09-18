@@ -2,6 +2,7 @@
 #define VME_ScalerV8x0_h
 
 #include <vector>
+#include <map>
 #include <string.h>
 
 #include "VME_GenericBoard.h"
@@ -187,6 +188,8 @@ namespace VME
       unsigned int* fBuffer;
       bool gEnd;
   };
+
+  typedef std::map<unsigned int,VME::ScalerV8x0*> ScalerCollection;
 }
 
 #endif

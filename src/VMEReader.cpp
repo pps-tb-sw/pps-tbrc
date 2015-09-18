@@ -233,6 +233,24 @@ VMEReader::AddTDC(uint32_t address)
 }
 
 void
+VMEReader::AddScaler(uint32_t address)
+{
+  if (!fBridge) throw Exception(__PRETTY_FUNCTION__, "No bridge detected! Aborting...", Fatal);
+  try {
+    fScalerCollection.insert(std::pair<uint32_t,VME::ScalerV8x0*>(
+      address,
+      new VME::ScalerV8x0(fBridge->GetHandle(), address)
+    ));
+  } catch (Exception& e) {
+    e.Dump();
+    if (fOnSocket) Client::Send(e);
+  }
+  std::ostringstream os;
+  os << "Scaler with base address 0x" << std::hex << address << " successfully built";
+  throw Exception(__PRETTY_FUNCTION__, os.str(), Info, TDC_ACQ_START);
+}
+
+void
 VMEReader::AddCFD(uint32_t address)
 {
   if (!fBridge) throw Exception(__PRETTY_FUNCTION__, "No bridge detected! Aborting...", Fatal);
