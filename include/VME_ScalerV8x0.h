@@ -1,10 +1,71 @@
 #ifndef VME_ScalerV8x0_h
 #define VME_ScalerV8x0_h
 
+#include <vector>
 #include "VME_GenericBoard.h"
 
 namespace VME
 {
+  /**
+   * \date 17 Sep 2015
+   * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+   */
+  enum ScalerV8x0DataFormat { DF32bit=0x0, DF26bit=0x1 };
+  enum ScalerV8x0TriggerSource { TSExternalTrigger=0x0, TSTimerTrigger=0x1, TSVMETrigger=0x2 };
+  
+  /**
+   * \brief Parser for a scaler event/header
+   * \date 17 Sep 2015
+   * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+   */
+  class ScalerEvent
+  {
+    public:
+      inline ScalerEvent(unsigned int word) : fWord(word) {;}
+      inline ~ScalerEvent() {;}
+
+      inline unsigned int GetWord() const { return fWord; }
+
+      inline unsigned short GetGeo() const { return ((fWord>>27)&0x1f); }
+      inline bool IsHeader(unsigned short geo=0) const {
+	bool header_bit = (fWord>>26)&0x1;
+	if (geo>0) return (header_bit and GetGeo()==geo);
+	return header_bit;
+      }
+
+      inline unsigned short GetTriggerNumber(unsigned short geo=0) const {
+	if (!IsHeader(geo)) throw Exception(__PRETTY_FUNCTION__, "Trying to extract the trigger number from a non-header ScalerEvent word", JustWarning);
+	return (fWord&0xffff);
+      }
+      inline ScalerV8x0TriggerSource GetTriggerSource(unsigned short geo=0) const {
+	if (!IsHeader(geo)) throw Exception(__PRETTY_FUNCTION__, "Trying to extract the trigger source from a non-header ScalerEvent word", JustWarning);
+	return static_cast<ScalerV8x0TriggerSource>((fWord>>16)&0x3);
+      }
+      inline unsigned short GetNumChannels(unsigned short geo=0) const {
+	if (!IsHeader(geo)) throw Exception(__PRETTY_FUNCTION__, "Trying to extract the number of enabled channels from a non-header ScalerEvent word", JustWarning);
+	return ((fWord>>18)&0x3f);
+      }
+      
+      inline unsigned short GetChannelId() const { return ((fWord>>27)&0x1f); }
+      inline unsigned int GetChannelCounter(const ScalerV8x0DataFormat& df) const {
+	switch (df) {
+          case DF32bit: return fWord;
+          case DF26bit: return (fWord&0x3ffffff);
+	}
+      }
+      
+    private:
+      unsigned int fWord;
+  };
+
+  /// A collection of ScalerEvent objects
+  typedef std::vector<ScalerEvent> ScalerEventCollection;
+  
+  /**
+   * \brief List of registers to handle a CAEN V8x0 scaler module
+   * \date 17 Sep 2015
+   * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+   */
   enum ScalerV8x0Register {
     kV8x0ChannelValue   = 0x1000,
     kV8x0ChannelEnable  = 0x1100,
@@ -18,6 +79,11 @@ namespace VME
     kV8x0SerialMSB      = 0x4f02,
     kV8x0SerialLSB      = 0x4f06
   };
+  
+  /**
+   * \date 17 Sep 2015
+   * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+   */
   class ScalerV8x0Control
   {
     public:
@@ -33,9 +99,8 @@ namespace VME
 	return static_cast<AcquisitionMode>(word1+(word2<<1));
       }
 
-      enum DataFormat { DF32bit=0x0, DF26bit=0x1 };
-      inline void SetDataFormat(const DataFormat& fmt) { SetBit(2, fmt); }
-      inline DataFormat GetDataFormat() const { return static_cast<DataFormat>(GetBit(2)); }
+      inline void SetDataFormat(const ScalerV8x0DataFormat& fmt) { SetBit(2, fmt); }
+      inline ScalerV8x0DataFormat GetDataFormat() const { return static_cast<ScalerV8x0DataFormat>(GetBit(2)); }
 
       inline void SetBusError(bool enable) { SetBit(4, enable); }
       inline bool GetBusError() const { return GetBit(4); }
@@ -57,6 +122,11 @@ namespace VME
       }
       unsigned short fWord;
   };
+  
+  /**
+   * \date 17 Sep 2015
+   * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+   */
   class ScalerV8x0Status
   {
     public:
@@ -74,6 +144,12 @@ namespace VME
     private:
       unsigned short fWord;
   };
+
+  /**
+   * \brief Handler object for a CAEN V8x0 scaler module
+   * \date 17 Sep 2015
+   * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+   */
   class ScalerV8x0 : public GenericBoard<ScalerV8x0Register,cvA24_U_DATA>
   {
     public:
@@ -92,6 +168,8 @@ namespace VME
       unsigned int GetPOI() const;
 
       unsigned int GetTriggerCounter() const;
+
+      ScalerEventCollection FetchEvents();
 
       ScalerV8x0Status GetStatus() const;
       ScalerV8x0Control GetControl() const;
