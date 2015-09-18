@@ -13,6 +13,17 @@ namespace VME
        << "  Type: " << std::dec << GetModuleType() << "\n\t"
        << "  Manufacturer: 0x" << std::hex << GetManufacturerId();
     PrintInfo(os.str());
+    fBuffer = (unsigned int*)malloc(32*1024*1024); // 32MB of buffer!
+    if (fBuffer==NULL) {
+      throw Exception(__PRETTY_FUNCTION__, "Output buffer has not been allocated!", Fatal);
+    }
+    gEnd = false;
+  }
+
+  ScalerV8x0::~ScalerV8x0()
+  {
+    free(fBuffer);
+    fBuffer = NULL;
   }
 
   unsigned int
@@ -82,18 +93,6 @@ namespace VME
     return 0;
   }
 
-  unsigned int
-  ScalerV8x0::GetChannelValue(unsigned short channel_id) const
-  {
-    uint32_t word;
-    ScalerV8x0Register reg = static_cast<ScalerV8x0Register>(kV8x0ChannelValue+(channel_id*4));
-    try {
-      ReadRegister(reg, &word);
-      return static_cast<unsigned int>(word);
-    } catch (Exception& e) { e.Dump(); }
-    return 0;
-  }
-
   void
   ScalerV8x0::SetPOI(unsigned int poi) const
   {
@@ -122,6 +121,47 @@ namespace VME
       return static_cast<unsigned int>(word);
     } catch (Exception& e) { e.Dump(); }
     return 0;
+  }
+
+  unsigned int
+  ScalerV8x0::GetChannelValue(unsigned short channel_id) const
+  {
+    if (channel_id<0 or channel_id>31) {
+      std::ostringstream os; os << "Trying to extract the value of a channel outside allowed range: " << channel_id;
+      throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+    }
+    uint32_t word;
+    ScalerV8x0Register reg = static_cast<ScalerV8x0Register>(kV8x0ChannelValue+(channel_id*4));
+    try {
+      ReadRegister(reg, &word);
+      return static_cast<unsigned int>(word);
+    } catch (Exception& e) { e.Dump(); }
+    return 0;
+  }
+
+  ScalerEventCollection
+  ScalerV8x0::FetchEvents()
+  {
+    if (gEnd)
+      throw Exception(__PRETTY_FUNCTION__, "Abort state detected... quitting", JustWarning, TDC_ACQ_STOP);
+    ScalerEventCollection ec; ec.clear();
+
+    memset(fBuffer, 0, sizeof(unsigned int));
+
+    int count = 0;
+    const int blts = 4096; // size of the transfer in bytes
+    bool finished;
+    std::ostringstream o;
+
+    // Start Readout (check if BERR is set to 0)
+    CVErrorCodes ret = CAENVME_BLTReadCycle(fHandle, fBaseAddr+kV8x0OutputBuffer, (char*)fBuffer, blts, cvA32_U_BLT, cvD32, &count);
+    finished = ((ret==cvSuccess)||(ret==cvBusError)||(ret==cvCommError)); //FIXME investigate...
+    if (finished && gEnd) {
+      throw Exception(__PRETTY_FUNCTION__, "Abort state detected... quitting", JustWarning, TDC_ACQ_STOP);
+    }
+    for (int i=0; i<count; i++) ec.push_back(ScalerEvent(fBuffer[i]));
+    
+    return ec;
   }
 
   ScalerV8x0Status
@@ -153,4 +193,12 @@ namespace VME
       WriteRegister(kV8x0Control, control.GetWord());
     } catch (Exception& e) { e.Dump(); }
   }
+
+  void
+  ScalerV8x0::abort()
+  {
+    // Raise flag
+    gEnd = true;
+  }
+  
 }

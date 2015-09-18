@@ -2,7 +2,11 @@
 #define VME_ScalerV8x0_h
 
 #include <vector>
+#include <string.h>
+
 #include "VME_GenericBoard.h"
+
+#define TDC_ACQ_STOP 20001
 
 namespace VME
 {
@@ -67,6 +71,7 @@ namespace VME
    * \author Laurent Forthomme <laurent.forthomme@cern.ch>
    */
   enum ScalerV8x0Register {
+    kV8x0OutputBuffer   = 0x0000,
     kV8x0ChannelValue   = 0x1000,
     kV8x0ChannelEnable  = 0x1100,
     kV8x0Control        = 0x1108,
@@ -155,7 +160,7 @@ namespace VME
   {
     public:
       ScalerV8x0(int32_t bhandle, uint32_t baseaddr);
-      inline ~ScalerV8x0() {;}
+      ~ScalerV8x0();
 
       unsigned int GetSerialNumber() const;
       unsigned short GetModuleVersion() const;
@@ -163,22 +168,24 @@ namespace VME
       unsigned short GetManufacturerId() const;
       //unsigned short GetIdentifier() const;
       unsigned short GetGEO() const;
-
-      unsigned int GetChannelValue(unsigned short channel_id) const;
       
       void SetPOI(unsigned int poi) const;
       unsigned int GetPOI() const;
 
       unsigned int GetTriggerCounter() const;
 
+      unsigned int GetChannelValue(unsigned short channel_id) const;
       ScalerEventCollection FetchEvents();
 
       ScalerV8x0Status GetStatus() const;
       ScalerV8x0Control GetControl() const;
       void SetControl(const ScalerV8x0Control& control) const;
+
+      void abort();
       
     private:
-
+      unsigned int* fBuffer;
+      bool gEnd;
   };
 }
 
