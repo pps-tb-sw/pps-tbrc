@@ -26,10 +26,10 @@ namespace VME
 
       inline unsigned int GetWord() const { return fWord; }
 
-      inline unsigned short GetGeo() const { return ((fWord>>27)&0x1f); }
+      inline unsigned short GetGEO() const { return ((fWord>>27)&0x1f); }
       inline bool IsHeader(unsigned short geo=0) const {
 	bool header_bit = (fWord>>26)&0x1;
-	if (geo>0) return (header_bit and GetGeo()==geo);
+	if (geo>0) return (header_bit and GetGEO()==geo);
 	return header_bit;
       }
 
@@ -71,6 +71,7 @@ namespace VME
     kV8x0ChannelEnable  = 0x1100,
     kV8x0Control        = 0x1108,
     kV8x0Status         = 0x110e,
+    kV8x0GEO            = 0x1110,
     kV8x0TriggerCounter = 0x1128,
     kV8x0FWVersion      = 0x1132,
     kV8x0OUI            = 0x402a,
@@ -161,6 +162,7 @@ namespace VME
       unsigned short GetModuleType() const;
       unsigned short GetManufacturerId() const;
       //unsigned short GetIdentifier() const;
+      unsigned short GetGEO() const;
 
       unsigned int GetChannelValue(unsigned short channel_id) const;
       

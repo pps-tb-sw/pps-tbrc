@@ -71,6 +71,17 @@ namespace VME
     return 0;
     }*/
 
+  unsigned short
+  ScalerV8x0::GetGEO() const
+  {
+    uint16_t word;
+    try {
+      ReadRegister(kV8x0GEO, &word);
+      return static_cast<unsigned short>(word&0x1f);
+    } catch (Exception& e) { e.Dump(); }
+    return 0;
+  }
+
   unsigned int
   ScalerV8x0::GetChannelValue(unsigned short channel_id) const
   {
