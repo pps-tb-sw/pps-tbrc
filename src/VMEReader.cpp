@@ -188,6 +188,27 @@ VMEReader::ReadXML(const char* filename)
       } catch (Exception& e) { throw e; }
     }
   }
+  for (tinyxml2::XMLElement* asca=doc.FirstChildElement("scaler"); asca!=NULL; asca=asca->NextSiblingElement("scaler")) {
+    if (const char* address=asca->Attribute("address")) {
+      unsigned long addr = static_cast<unsigned long>(strtol(address, NULL, 0));
+      if (!addr) throw Exception(__PRETTY_FUNCTION__, "Failed to parse scaler's base address", Fatal);
+      try {
+        try { AddScaler(addr); } catch (Exception& e) { if (fOnSocket) Client::Send(e); }
+        VME::ScalerV8x0* sca = GetScaler(addr);
+	VME::ScalerV8x0Control control = sca->GetControl();
+        if (const char* hdr=asca->Attribute("header")) {
+	  if (!strcmp(hdr, "true") or !strcmp(hdr, "True") or !strcmp(hdr, "1")) control.SetHeader(true);
+	  if (!strcmp(hdr, "false") or !strcmp(hdr, "False") or !strcmp(hdr, "0")) control.SetHeader(false);
+	}
+	if (tinyxml2::XMLElement* poi=asca->FirstChildElement("poi")) { sca->SetPOI(atoi(poi->GetText())); }
+	if (tinyxml2::XMLElement* df=asca->FirstChildElement("data_format")) {
+	  if (!strcmp(df->GetText(), "26bit")) control.SetDataFormat(VME::DF26bit);
+	  if (!strcmp(df->GetText(), "32bit")) control.SetDataFormat(VME::DF32bit);
+	}
+	sca->SetControl(control);
+      } catch (Exception& e) { throw e; }
+    }
+  }
   std::cout << "Global acquisition mode: " << fGlobalAcqMode << std::endl;
   unsigned int run = GetRunNumber();
   std::ifstream source(filename, std::ios::binary);

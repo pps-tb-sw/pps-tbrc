@@ -3,7 +3,7 @@
 namespace VME
 {
   ScalerV8x0::ScalerV8x0(int32_t bhandle, uint32_t baseaddr) :
-    GenericBoard<ScalerV8x0Register,cvA32_U_DATA>(bhandle, baseaddr)
+    GenericBoard<ScalerV8x0Register,cvA32_U_DATA>(bhandle, baseaddr), gEnd(false)
   {
     std::ostringstream os;
     os << "New Scaler module added:" << "\n\t"
@@ -17,7 +17,18 @@ namespace VME
     if (fBuffer==NULL) {
       throw Exception(__PRETTY_FUNCTION__, "Output buffer has not been allocated!", Fatal);
     }
-    gEnd = false;
+
+    // Default values
+    SetPOI(0xffffffff);
+    
+    ScalerV8x0Control control = GetControl();
+    control.SetDataFormat(DF26bit);
+    control.SetAcquisitionMode(ScalerV8x0Control::TriggerDisabled);
+    control.SetBusError(false);
+    control.SetHeader(true);
+    control.SetClearMEB(false);
+    control.SetAutoReset(false);
+    SetControl(control);
   }
 
   ScalerV8x0::~ScalerV8x0()
