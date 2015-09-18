@@ -3,7 +3,7 @@
 namespace VME
 {
   ScalerV8x0::ScalerV8x0(int32_t bhandle, uint32_t baseaddr) :
-    GenericBoard<ScalerV8x0Register,cvA24_U_DATA>(bhandle, baseaddr)
+    GenericBoard<ScalerV8x0Register,cvA32_U_DATA>(bhandle, baseaddr)
   {
     std::ostringstream os;
     os << "New Scaler module added:" << "\n\t"

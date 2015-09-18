@@ -156,7 +156,7 @@ namespace VME
    * \date 17 Sep 2015
    * \author Laurent Forthomme <laurent.forthomme@cern.ch>
    */
-  class ScalerV8x0 : public GenericBoard<ScalerV8x0Register,cvA24_U_DATA>
+  class ScalerV8x0 : public GenericBoard<ScalerV8x0Register,cvA32_U_DATA>
   {
     public:
       ScalerV8x0(int32_t bhandle, uint32_t baseaddr);
