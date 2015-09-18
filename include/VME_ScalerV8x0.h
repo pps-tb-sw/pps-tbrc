@@ -6,16 +6,17 @@
 namespace VME
 {
   enum ScalerV8x0Register {
-    kV8x0ChannelValue  = 0x1000,
-    kV8x0ChannelEnable = 0x1100,
-    kV8x0Control       = 0x1108,
-    kV8x0Status        = 0x110e,
-    kV8x0FWVersion     = 0x1132,
-    kV8x0OUI           = 0x402a,
-    kV8x0ModelVersion  = 0x4032,
-    kV8x0HWRevision    = 0x404e,
-    kV8x0SerialMSB     = 0x4f02,
-    kV8x0SerialLSB     = 0x4f06
+    kV8x0ChannelValue   = 0x1000,
+    kV8x0ChannelEnable  = 0x1100,
+    kV8x0Control        = 0x1108,
+    kV8x0Status         = 0x110e,
+    kV8x0TriggerCounter = 0x1128,
+    kV8x0FWVersion      = 0x1132,
+    kV8x0OUI            = 0x402a,
+    kV8x0ModelVersion   = 0x4032,
+    kV8x0HWRevision     = 0x404e,
+    kV8x0SerialMSB      = 0x4f02,
+    kV8x0SerialLSB      = 0x4f06
   };
   class ScalerV8x0Control
   {
@@ -89,6 +90,8 @@ namespace VME
       
       void SetPOI(unsigned int poi) const;
       unsigned int GetPOI() const;
+
+      unsigned int GetTriggerCounter() const;
 
       ScalerV8x0Status GetStatus() const;
       ScalerV8x0Control GetControl() const;

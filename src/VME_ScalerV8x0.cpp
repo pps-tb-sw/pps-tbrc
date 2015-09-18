@@ -102,6 +102,17 @@ namespace VME
     return 0;
   }
 
+  unsigned int
+  ScalerV8x0::GetTriggerCounter() const
+  {
+    uint32_t word;
+    try {
+      ReadRegister(kV8x0TriggerCounter, &word);
+      return static_cast<unsigned int>(word);
+    } catch (Exception& e) { e.Dump(); }
+    return 0;
+  }
+
   ScalerV8x0Status
   ScalerV8x0::GetStatus() const
   {
