@@ -11,7 +11,7 @@ function ppsGUI() {
 }
 
 function ppsLastRun() {
-  /usr/bin/python $PPS_PATH/../scripts/run_number.py
+  /usr/bin/python $PPS_PATH/../scripts/run_number.py $1
 }
 
 function ppsDQM() {
