@@ -51,7 +51,7 @@ namespace VME
             case TDCEvent::TDCMeasurement:
               if (!e->IsTrailing()) { leading = *e; has_leading = true; }
               else {
-                if (!has_leading) return;
+                if (!has_leading) throw Exception(__PRETTY_FUNCTION__, "Failed to retrieve leading/trailing edges", JustWarning);//return;
                 fEvents.push_back(std::pair<TDCEvent,TDCEvent>(leading, *e));
                 num_measurements++;
               }

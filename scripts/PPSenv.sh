@@ -10,6 +10,10 @@ function ppsGUI() {
   /usr/bin/python $PPS_PATH/../scripts/RunControl.py
 }
 
+function ppsLastRun() {
+  /usr/bin/python $PPS_PATH/../scripts/run_number.py $1
+}
+
 function ppsDQM() {
   declare -a proc=(
     "gastof"

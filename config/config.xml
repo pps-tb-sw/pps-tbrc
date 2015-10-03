@@ -1,28 +1,30 @@
 <?xml version="1.0"?>
-<!--<triggering mode="continuous_storage" />-->
+<!--triggering mode="continuous_storage" />-->
 <!--<triggering mode="trigger_start" />-->
 <triggering mode="trigger_matching" />
-<fpga address="0x32100000" type="tdc_fanout">
+<fpga address="0x32100000">
+  <threshold>
+    <tdc0>40</tdc0>
+    <tdc1>40</tdc1>
+    <tdc2>40</tdc2>
+    <tdc3>40</tdc3>
+  </threshold>
+</fpga>
+<fpga address="0x42100000" type="tdc_fanout">-->
   <clock>
     <source>internal</source>
     <period>1</period>
   </clock>
   <trigger>
+    <!--<source>internal</source>-->
+    <!--<period>100000</period>-->
+    <!--<period>10000000</period>--> <!-- means 250ms in GUI -->
     <source>external</source>
-    <period>1000000</period>
   </trigger>
-  <signal>
+  <!--<signal>
     <source>internal</source>
     <poi>4294967295</poi>
-  </signal>
-<!--</fpga>
-<fpga address="0x42100000" type="tdc_fanout">-->
-  <threshold>
-    <tdc0>80</tdc0>
-    <tdc1>80</tdc1>
-    <tdc2>80</tdc2>
-    <tdc3>80</tdc3>
-  </threshold>
+  </signal>-->
 </fpga>
 <tdc address="0x00aa0000">
   <detector>quartic_1</detector>
@@ -31,6 +33,8 @@
   <dll>PLL_High_Resolution</dll>
   <ettt/>
   <trigger_window>
+    <!--<width>4095</width>-->
+    <!--<offset>-4095</offset>-->
     <width>400</width>
     <offset>-400</offset>
   </trigger_window>
@@ -48,6 +52,32 @@
 </tdc>
 <tdc address="0x00cc0000">
   <detector>timingref</detector>
+  <verbosity>1</verbosity>
+  <det_mode>trailead</det_mode>
+  <dll>PLL_High_Resolution</dll>
+  <poi>
+    <group0>1</group0>
+    <group1>0</group1>
+  </poi>
+  <ettt/>
+  <trigger_window>
+    <width>400</width>
+    <offset>-400</offset>
+  </trigger_window>
+</tdc>
+<tdc address="0x00dd0000">
+  <detector>gastof_1</detector>
+  <verbosity>1</verbosity>
+  <det_mode>trailead</det_mode>
+  <dll>PLL_High_Resolution</dll>
+  <ettt/>
+  <trigger_window>
+    <width>400</width>
+    <offset>-400</offset>
+  </trigger_window>
+</tdc>
+<tdc address="0x00ee0000">
+  <detector>gastof_2</detector>
   <verbosity>1</verbosity>
   <det_mode>trailead</det_mode>
   <dll>PLL_High_Resolution</dll>
@@ -69,7 +99,5 @@
   </dead_time>
   <threshold>
     <channel id="0">30</channel>
-    <channel id="1">30</channel>
-    <channel id="2">6</channel>
   </threshold>
 </cfd>

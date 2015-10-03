@@ -410,12 +410,12 @@ namespace VME
       if (tdc_number == 0){
 	 WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + OneVolt);
          sleep(1);
-         digitalValue = (uint32_t) (1.758683*voltage-15.74276+0.5);
+         digitalValue = (uint32_t) (1.74*voltage+12.965+0.5);
          WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH1 + OneVolt + digitalValue);
          sleep(1);
          WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH2 + OneVolt);
          sleep(1);
-         digitalValue = (uint32_t) (1.753127*voltage-15.45482+0.5);
+         digitalValue = (uint32_t) (1.7458*voltage-5.6654+0.5);
          WriteRegister(kV1495ThresholdVoltage0, (oldvoltage & 0xFFFF0000) + cH3 + OneVolt + digitalValue);
       }
       if (tdc_number == 1){

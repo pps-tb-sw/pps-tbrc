@@ -108,6 +108,7 @@ VMEReader::ReadXML(const char* filename)
             control.SetTriggeringMode(VME::FPGAUnitV1495Control::TriggerMatching); break;
         }
         fpga->SetControl(control);
+        fpga->GetControl().Dump();
         fpga->DumpFWInformation();
       } catch (Exception& e) { e.Dump(); if (fOnSocket) Client::Send(e); throw e; }
     }
