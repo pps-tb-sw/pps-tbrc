@@ -14,6 +14,10 @@ function ppsLastRun() {
   /usr/bin/python $PPS_PATH/../scripts/run_number.py $1
 }
 
+function ppsHVstatus() {
+  /usr/bin/python $PPS_PATH/../scripts/hv_status.py $1
+}
+
 function ppsDQM() {
   declare -a proc=(
     "gastof"
