@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<scaler address="0xabcd0000" header="true">
+  <poi>4294967295</poi> <!-- full coverage -->
+  <data_format>26bit</data_format>
+</scaler>

@@ -10,6 +10,7 @@
 #include "VME_CFDV812.h"
 #include "VME_CAENETControllerV288.h"
 #include "VME_TDCV1x90.h"
+#include "VME_ScalerV8x0.h"
 
 #include "NIM_HVModuleN470.h"
 
@@ -57,6 +58,23 @@ class VMEReader : public Client
     }
     inline size_t GetNumTDC() const { return fTDCCollection.size(); }
     inline VME::TDCCollection GetTDCCollection() { return fTDCCollection; }
+
+    /**
+     * \brief Add a scaler to handle
+     * \param[in] address 32-bit address of the scaler module on the VME bus
+     * Create a new scaler handler for the VME bus
+     */
+    void AddScaler(uint32_t address);
+    /**
+     * \brief Get a scaler on the VME bus
+     * Return a pointer to the scaler object, given its physical address on the VME bus
+     */
+    inline VME::ScalerV8x0* GetScaler(uint32_t address) {
+      if (fScalerCollection.count(address)==0) return 0;
+      return fScalerCollection[address];
+    }
+    inline size_t GetNumScaler() const { return fScalerCollection.size(); }
+    inline VME::ScalerCollection GetScalerCollection() { return fScalerCollection; }
 
     void AddIOModule(uint32_t address);
     inline VME::IOModuleV262* GetIOModule() { return fSG; }
@@ -166,8 +184,10 @@ class VMEReader : public Client
     VME::CFDCollection fCFDCollection;
     /// Pointer to the VME input/output module object
     VME::IOModuleV262* fSG;
-    /// Pointer to the VME general purpose FPGA unit object
+    /// A set of pointers to VME general purpose FPGA unit objects indexed by their physical VME address
     VME::FPGAUnitCollection fFPGACollection;
+    /// A set of pointers to scaler objects indexed by their physical VME address
+    VME::ScalerCollection fScalerCollection;
     /// Pointer to the VME CAENET controller
     VME::CAENETControllerV288* fCAENET;
     /// Pointer to the NIM high voltage module (passing through the CAENET controller)
