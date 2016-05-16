@@ -49,8 +49,13 @@ void
 Socket::Configure()
 {
   const int on = 1/*, off = 0*/;
-  if (setsockopt(fSocketId, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on))!=0) {
-    throw Exception(__PRETTY_FUNCTION__, "Cannot modify socket options", Fatal, SOCKET_ERROR(errno));
+  struct timeval timeout;      
+  timeout.tv_sec = 10;
+  timeout.tv_usec = 0;
+  if (setsockopt(fSocketId, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout))!=0
+   or setsockopt(fSocketId, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout))!=0
+   or setsockopt(fSocketId, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on))!=0) {
+    throw Exception(__PRETTY_FUNCTION__, "Cannot modify socket options", Fatal, SOCKET_ERROR(errno));    
   }
 }
 
@@ -95,7 +100,7 @@ Socket::AcceptConnections(Socket& socket)
   socklen_t len = sizeof(fAddress);
   socket.SetSocketId(accept(fSocketId, (struct sockaddr*)&fAddress, &len));
   std::ostringstream o; o << "New client with # " << socket.GetSocketId();
-  Exception(__PRETTY_FUNCTION__, o.str(), Info).Dump();
+  PrintInfo(o.str());
   if (socket.GetSocketId()<0) {
     throw Exception(__PRETTY_FUNCTION__, "Cannot accept client!", JustWarning, SOCKET_ERROR(errno));
   }
@@ -132,8 +137,8 @@ void
 Socket::SendMessage(Message message, int id) const
 {
   if (id<0) id = fSocketId;
-  
   std::string message_s = message.GetString();
+  usleep(1000);
   if (send(id, message_s.c_str(), message_s.size(), MSG_NOSIGNAL)<=0) {
     throw Exception(__PRETTY_FUNCTION__, "Cannot send message!", JustWarning, SOCKET_ERROR(errno));
   }
@@ -171,5 +176,5 @@ Socket::DumpConnected() const
     os << " " << it->first;
     if (it->second) os << " (web)";
   }
-  Exception(__PRETTY_FUNCTION__, os.str(), Info).Dump();
+  PrintInfo(os.str());
 }

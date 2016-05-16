@@ -10,8 +10,9 @@ Client::~Client()
 }
 
 bool
-Client::Connect()
+Client::Connect(const SocketType& type)
 {
+  fType = type;
   try {
     Start();
     PrepareConnection();
@@ -70,6 +71,7 @@ Client::Disconnect()
   } catch (Exception& e) {
     if (e.ErrorNumber()!=11000) // client has been disconnected
       e.Dump();
+    else return;
   }
 }
 
@@ -80,11 +82,8 @@ Client::Receive()
   try {
     msg = FetchMessage();
   } catch (Exception& e) {
-    if (e.ErrorNumber()!=11000) // client has been disconnected
-      e.Dump();
-    else {
+    if (e.ErrorNumber()==11000) // client has been disconnected
       throw Exception(__PRETTY_FUNCTION__, "Some other socket asked for this client's disconnection. Obtemperating...", Fatal);
-    }
   }
   if (msg.GetKey()==MASTER_DISCONNECT) {
     throw Exception(__PRETTY_FUNCTION__, "Master disconnected!", Fatal);
@@ -96,9 +95,9 @@ Client::Receive()
     Send(SocketMessage(CLIENT_TYPE, static_cast<int>(GetType())));
   } 
   else if (msg.GetKey()==PING_CLIENT) {
-    ostringstream os; os << "Pong. My name is " << GetSocketId() << " and I feel fine, thank you!";
+    std::ostringstream os; os << "Pong. My name is " << GetSocketId() << " and I feel fine, thank you!";
     Send(SocketMessage(PING_ANSWER, os.str()));
-    Exception(__PRETTY_FUNCTION__, "Got a ping, answering...", Info).Dump();
+    PrintInfo("Got a ping, answering...");
   } 
   else if (msg.GetKey()==CLIENTS_LIST) {
     VectorValue vals = msg.GetVectorValue();
@@ -107,9 +106,24 @@ Client::Receive()
       if (i!=0) o << ", ";
       o << *v;
     }
-    Exception(__PRETTY_FUNCTION__, o.str(), Info).Dump();
+    PrintInfo(o.str());
   }
   else {
     ParseMessage(msg);
   }
+}
+
+SocketMessage
+Client::Receive(const MessageKey& key)
+{
+  SocketMessage msg;
+  try {
+    msg = FetchMessage();
+    if (msg.GetKey()==key) { return msg; }
+  } catch (Exception& e) {
+    if (e.ErrorNumber()==11000) // client has been disconnected
+      throw Exception(__PRETTY_FUNCTION__, "Some other socket asked for this client's disconnection. Obtemperating...", Fatal);
+    e.Dump();
+  }
+  return msg;
 }

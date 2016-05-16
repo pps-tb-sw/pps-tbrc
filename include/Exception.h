@@ -2,8 +2,12 @@
 #define Exception_h
 
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <string>
 #include <cstdlib> // exit()
+
+#define PrintInfo(m) Exception(__PRETTY_FUNCTION__, m, Info).Dump();
 
 /**
  * \brief Enumeration of exception severities
@@ -41,8 +45,8 @@ class Exception
     }
 
     inline ~Exception() {
-      // we stop this process' execution on fatal exception
       if (Type()==Fatal) exit(0);
+      // we stop this process' execution on fatal exception
     }
     
     inline std::string From() const { return fFrom; }
@@ -74,6 +78,12 @@ class Exception
         os << "-----------------------------------------------------------" << std::endl
            << " Error #" << ErrorNumber() << std::endl;
       os << "===========================================================" << std::endl;
+    }
+    inline std::string OneLine() const {
+      std::ostringstream os;
+      os << "[" << Type() << "] === " << From() << " === "
+         << Description();
+      return os.str();
     }
     
   private:

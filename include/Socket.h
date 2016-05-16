@@ -20,10 +20,10 @@
 
 #include "Exception.h"
 #include "SocketMessage.h"
-#include "HTTPMessage.h"
 
 #define SOCKET_ERROR(x) 10000+x
 #define MAX_WORD_LENGTH 5000
+#define MAX_SOCKET_ATTEMPTS 2
 
 /**
  * \defgroup Socket Socket communication objects
@@ -43,7 +43,7 @@ class Socket
     /**
      * \brief Type of actor playing a role on the socket
      */
-    typedef enum { INVALID=-1, MASTER=0, WEBSOCKET_CLIENT, CLIENT, DETECTOR } SocketType;
+    typedef enum { INVALID=-1, MASTER=0, WEBSOCKET_CLIENT, CLIENT, DETECTOR, DQM, DAQ } SocketType;
     typedef std::set< std::pair<int,SocketType> > SocketCollection;
   
   public:

@@ -2,6 +2,10 @@
 #define Messenger_h
 
 #include "Socket.h"
+#include "OnlineDBHandler.h"
+
+#include <unistd.h>
+#include <sys/wait.h>
 
 /**
  * Messenger/broadcaster object used by the server to send/receive commands from
@@ -38,7 +42,22 @@ class Messenger : public Socket
      * \param[in] m Message to transmit
      * \param[in] sid Unique identifier of the client on this socket
      */
-    inline void Send(const Message& m, int sid) const;
+    void Send(const Message& m, int sid) const;
+    /**
+     * \brief Send any type of message to all clients of one type
+     * \param[in] type Client type
+     * \param[in] m Message to transmit
+     */
+    inline void SendAll(const Socket::SocketType& type, const Message& m) const {
+      for (SocketCollection::const_iterator it=fSocketsConnected.begin(); it!=fSocketsConnected.end(); it++) {
+        if (it->second==type) Send(m, it->first);
+      }
+    }
+    inline void SendAll(const Socket::SocketType& type, const Exception& e) const {
+      for (SocketCollection::const_iterator it=fSocketsConnected.begin(); it!=fSocketsConnected.end(); it++) {
+        if (it->second==type) Send(SocketMessage(EXCEPTION, e.OneLine()), it->first);
+      }
+    }
     /// Handle a message reception from a client
     void Receive();
     /**
@@ -46,6 +65,9 @@ class Messenger : public Socket
      * \param[in] m Message to transmit
      */
     void Broadcast(const Message& m) const;
+    /// Start the data acquisition
+    void StartAcquisition();
+    void StopAcquisition();
     /// Socket actor type retrieval method
     inline SocketType GetType() const { return MASTER; }
   private:
@@ -69,8 +91,10 @@ class Messenger : public Socket
      * \param[in] Unique identifier of the client sending the message
      */
     void ProcessMessage(SocketMessage m, int sid);
-    WebSocket* fWS;
     int fNumAttempts;
+    pid_t fPID;
+    
+    int fStdoutPipe[2], fStderrPipe[2];
 };
 
 #endif

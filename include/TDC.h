@@ -23,6 +23,20 @@
 class TDC
 {
   public:
+    /**
+     * \brief TDC acquisition mode
+     * \ingroup HPTDC
+     */
+    enum AcquisitionMode {
+      CONT_STORAGE,
+      TRIG_MATCH,
+    };
+    enum DetectionMode {
+      PAIR      = 0x0,
+      OTRAILING = 0x1,
+      OLEADING  = 0x2,
+      TRAILEAD  = 0x3
+    };
     TDC(unsigned int id, USBHandler* h);
     inline ~TDC() {;}
     

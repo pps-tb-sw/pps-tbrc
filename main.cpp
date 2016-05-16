@@ -1,17 +1,21 @@
 #include "Messenger.h"
+#include "Client.h"
+#include "FileConstants.h"
 
 #include <iostream>
-#include <unistd.h>
+#include <fstream>
 
 using namespace std;
 
 Messenger* m = 0;
+Client* l = 0;
 int gEnd = 0;
 
 void CtrlC(int aSig) {
   if (gEnd==0) {
     cout << endl << "[C-c] Trying a clean exit!" << endl;
     if (m) { cout << "Trying to disconnect the messenger" << endl; delete m; }
+    if (l) { cout << "Trying to disconnect the first client" << endl; delete l; }
     exit(0);
   }
   else if (gEnd>=5) {
@@ -24,23 +28,20 @@ void CtrlC(int aSig) {
 int main(int argc, char* argv[])
 {
   signal(SIGINT, CtrlC);
-  m = new Messenger(1987);
 
+  // Where to put the logs
+  ofstream err_log("master.err", ios::binary);
+  const Logger lr(err_log, cerr);
+
+  m = new Messenger(1987);
   if (!m->Connect()) {
-    cout << "Error while trying to connect the messenger!" << endl;
+    cout << "Failed to connect the messenger!" << endl;
     return -1;
   }
-  
-  pid_t pid;
-  
   while (true) {
-    try {
-      m->Receive();
-    } catch (Exception& e) {
-      e.Dump();
-    }
+    try { m->Receive(); } catch (Exception& e) { e.Dump(); }
   }
-  
+
   delete m;
   return 0;
 }
