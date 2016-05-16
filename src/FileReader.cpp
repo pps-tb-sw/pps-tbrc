@@ -59,14 +59,14 @@ FileReader::Dump() const
 }
 
 bool
-FileReader::GetNextEvent(VME::TDCEvent* ev)
+FileReader::GetNextEvent(TDCEvent* ev)
 {
   uint32_t buffer;
   fFile.read((char*)&buffer, sizeof(uint32_t));
   ev->SetWord(buffer);
 #ifdef DEBUG
   std::cerr << "Event type: " << ev->GetType();
-  if (ev->GetType()==VME::TDCEvent::TDCMeasurement)
+  if (ev->GetType()==TDCEvent::TDCMeasurement)
     std::cerr << "  channel " << std::setw(2) << ev->GetChannelId() << "  trail? " << ev->IsTrailing();
   std::cerr << std::endl;
 #endif
@@ -75,21 +75,21 @@ FileReader::GetNextEvent(VME::TDCEvent* ev)
 }
 
 bool
-FileReader::GetNextMeasurement(unsigned int channel_id, VME::TDCMeasurement* mc)
+FileReader::GetNextMeasurement(unsigned int channel_id, TDCMeasurement* mc)
 {
-  VME::TDCEvent ev;
-  std::vector<VME::TDCEvent> ec;
+  TDCEvent ev;
+  std::vector<TDCEvent> ec;
   /*do { GetNextEvent(&ev);
     std::cout << ev.GetChannelId() << " type: " << ev.GetType() << std::endl; 
-  } while (ev.GetType()!=VME::TDCEvent::TDCHeader);*/
+  } while (ev.GetType()!=TDCEvent::TDCHeader);*/
   /*do {
     GetNextEvent(&ev);
     if (ev.GetChannelId()!=channel_id) continue;
     ec.push_back(ev);
     std::cout << ev.GetType() << std::endl;
-  } while (ev.GetType()!=VME::TDCEvent::TDCHeader);*/
+  } while (ev.GetType()!=TDCEvent::TDCHeader);*/
 
-  if (fReadoutMode==VME::CONT_STORAGE) {
+  if (fReadoutMode==CONT_STORAGE) {
     bool has_lead = false, has_trail = false, has_error = false;
     while (true) {
       if (!GetNextEvent(&ev)) return false;
@@ -98,52 +98,52 @@ FileReader::GetNextMeasurement(unsigned int channel_id, VME::TDCMeasurement* mc)
       ec.push_back(ev);
 
       switch (ev.GetType()) {
-        case VME::TDCEvent::TDCHeader:
-        case VME::TDCEvent::TDCTrailer:
+        case TDCEvent::TDCHeader:
+        case TDCEvent::TDCTrailer:
           //std::cerr << "Event Id=" << ev.GetEventId() << std::endl;
           break;
-        case VME::TDCEvent::TDCMeasurement:
+        case TDCEvent::TDCMeasurement:
           //std::cerr << "Leading measurement? " << (!ev.IsTrailing()) << std::endl;
           if (ev.IsTrailing()) has_trail = true;
           else has_lead = true;
           break;
-        case VME::TDCEvent::GlobalHeader:
-        case VME::TDCEvent::GlobalTrailer:
-        case VME::TDCEvent::ETTT:
+        case TDCEvent::GlobalHeader:
+        case TDCEvent::GlobalTrailer:
+        case TDCEvent::ETTT:
           break;
-        case VME::TDCEvent::TDCError:
+        case TDCEvent::TDCError:
           has_error = true;
           //std::cerr << " ---> Error flags: " << ev.GetErrorFlags() << std::endl;
           break;
-        case VME::TDCEvent::Filler:
-        case VME::TDCEvent::Trigger:
+        case TDCEvent::Filler:
+        case TDCEvent::Trigger:
           break;
       }
       if (has_lead and has_trail) break;
-      if (ev.GetType()==VME::TDCEvent::Trigger) break;
+      if (ev.GetType()==TDCEvent::Trigger) break;
     }
     if (has_error) throw Exception(__PRETTY_FUNCTION__, "Measurement has at least one error word.", JustWarning, 41000);
   }
-  else if (fReadoutMode==VME::TRIG_MATCH) {
+  else if (fReadoutMode==TRIG_MATCH) {
     bool has_error = false;
     while (true) {
       if (!GetNextEvent(&ev)) return false;
       //ev.Dump();
       /*std::cout << "0x" << std::hex << ev.GetType();
-      if (ev.GetType()==VME::TDCEvent::TDCMeasurement) {
+      if (ev.GetType()==TDCEvent::TDCMeasurement) {
         std::cout << "\t" << ev.IsTrailing() << "\t" << ev.GetChannelId();
       }
       std::cout << std::endl;*/
 
-      if (ev.GetType()==VME::TDCEvent::TDCMeasurement) {
+      if (ev.GetType()==TDCEvent::TDCMeasurement) {
         if (ev.GetChannelId()!=channel_id) continue;
       }
-      else if (ev.GetType()==VME::TDCEvent::TDCError) {
+      else if (ev.GetType()==TDCEvent::TDCError) {
         has_error = true;
       }
       ec.push_back(ev);
 
-      if (ev.GetType()==VME::TDCEvent::GlobalTrailer) break;
+      if (ev.GetType()==TDCEvent::GlobalTrailer) break;
     }
     //if (has_error) throw Exception(__PRETTY_FUNCTION__, "Measurement has at least one error word.", JustWarning, 41000);
   }

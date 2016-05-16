@@ -11,7 +11,7 @@
 #include "FileConstants.h"
 #include "Exception.h"
 
-#include "VME_TDCMeasurement.h"
+#include "TDCMeasurement.h"
 
 /**
  * \brief Handler for a TDC output file readout
@@ -42,19 +42,19 @@ class FileReader
     inline unsigned int GetDetectionMode() const { return fHeader.det_mode; }
     
     unsigned long GetNumEvents() const { return fNumEvents; }
-    bool GetNextEvent(VME::TDCEvent*);
+    bool GetNextEvent(TDCEvent*);
     /**
      * \brief Fetch the next full measurement on a given channel
      * \param[in] channel_id Unique identifier of the channel number to retrieve
      * \param[out] m A full measurement with leading, trailing times, ...
      * \return A boolean stating the success of retrieval operation
      */
-    bool GetNextMeasurement(unsigned int channel_id, VME::TDCMeasurement* mc);
+    bool GetNextMeasurement(unsigned int channel_id, TDCMeasurement* mc);
     
   private:
     std::ifstream fFile;
     file_header_t fHeader;
-    VME::AcquisitionMode fReadoutMode;
+    AcquisitionMode fReadoutMode;
     time_t fWriteTime;
     unsigned long fNumEvents;
 };
