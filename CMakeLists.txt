@@ -4,12 +4,14 @@ project(PPS_TB_RC)
 set(CAEN_LOCATION "/usr/lib")
 set(GCC_COMPILE_FLAGS "-Wall -fPIC -O2 -g -lsqlite3")
 set(GCC_LINK_FLAGS "-lsqlite3")
+set(QUSB_LOCATION "${PROJECT_SOURCE_DIR}/external/xpedaq/quickusb-2.15.2/")
+set(QUSB_LIB_LOCATION "${QUSB_LOCATION}/linux/lib/x86_64/")
 add_definitions(${GCC_COMPILE_FLAGS})
 
 file(GLOB fpga_sources ${PROJECT_SOURCE_DIR}/src/*Handler.cpp)
 file(GLOB tdc_sources ${PROJECT_SOURCE_DIR}/src/TDC*.cpp)
 add_library(det_lib OBJECT ${fpga_sources} ${tdc_sources})
-set_property(TARGET det_lib PROPERTY LINK_FLAGS "-lusb-1.0")
+set_property(TARGET det_lib PROPERTY LINK_FLAGS "-L${QUSB_LIB_LOCATION} -lquickusb -Wl,-R${QUSB_LIB_LOCATION}")
 
 # File reader
 file(GLOB reader_sources ${PROJECT_SOURCE_DIR}/src/File*.cpp)
@@ -23,6 +25,7 @@ add_library(src_lib OBJECT ${sources})
 set_property(TARGET src_lib PROPERTY LINK_FLAGS "-lsqlite3")
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${QUSB_LOCATION}")
 
 add_executable(ppsRun main.cpp $<TARGET_OBJECTS:src_lib>)
 set_property(TARGET ppsRun PROPERTY LINK_FLAGS "-lsqlite3")
@@ -41,7 +44,9 @@ foreach(_script ${config_files})
   configure_file(${_script} ${PROJECT_BINARY_DIR}/${_script} COPYONLY)
 endforeach()
 
-set(CMAKE_CXX_FLAGS "-lusb-1.0")
+#set(CMAKE_CXX_FLAGS "-L${QUSB_LIB_LOCATION} -lquickusb -Wl,-R${QUSB_LIB_LOCATION}")
+
+message(STATUS ${QUSB_LIB_LOCATION})
 
 add_executable(ppsFetch fetch.cpp $<TARGET_OBJECTS:src_lib> $<TARGET_OBJECTS:det_lib>)
-set_property(TARGET ppsFetch PROPERTY LINK_FLAGS "-ltinyxml2 -lsqlite3 -lusb-1.0")
+set_property(TARGET ppsFetch PROPERTY LINK_FLAGS "-ltinyxml2 -lsqlite3 -L${QUSB_LIB_LOCATION} -lquickusb -Wl,-R${QUSB_LIB_LOCATION}")

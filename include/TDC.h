@@ -1,7 +1,7 @@
 #ifndef TDC_h
 #define TDC_h
 
-#include "USBHandler.h"
+#include "QuickUSBHandler.h"
 
 #include "TDCSetup.h"
 #include "TDCControl.h"
@@ -37,7 +37,7 @@ class TDC
       OLEADING  = 0x2,
       TRAILEAD  = 0x3
     };
-    TDC(unsigned int id, USBHandler* h);
+    TDC(unsigned int id, QuickUSBHandler* h);
     inline ~TDC() {;}
     
     /// Submit the HPTDC setup word as a TDCSetup object
@@ -64,7 +64,7 @@ class TDC
     template<class T> T ReadRegister(unsigned int r);
     
     unsigned int fId;
-    USBHandler* fUSB;
+    QuickUSBHandler* fUSB;
     
     TDCSetup fSetup;
     TDCControl fControl;

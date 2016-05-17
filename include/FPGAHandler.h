@@ -2,7 +2,7 @@
 #define FPGAHandler_h
 
 #include "Client.h"
-#include "USBHandler.h"
+#include "QuickUSBHandler.h"
 #include "TDC.h"
 #include "FileConstants.h"
 
@@ -24,13 +24,13 @@
  * \date 14 Apr 2015
  * \ingroup FPGA
  */
-class FPGAHandler : public Client, private USBHandler
+class FPGAHandler : public Client, private QuickUSBHandler
 {
   public:
     /// Bind to a FPGA through the USB protocol, and to the socket
     FPGAHandler(int port, const char* dev);
     ~FPGAHandler();
-    void Stop() { USBHandler::fIsStopping = true; }
+    void Stop() { QuickUSBHandler::fIsStopping = true; }
     
     /// Open an output file to store header/HPTDC events
     void OpenFile();

@@ -1,0 +1,3 @@
+[submodule "external/xpedaq"]
+	path = external/xpedaq
+	url = git@github.com:lucabaldini/xpedaq.git
