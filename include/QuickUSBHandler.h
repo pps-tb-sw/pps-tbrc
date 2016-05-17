@@ -26,11 +26,21 @@ class QuickUSBHandler
     
     void Init();
     void Reset() const;
+
+    struct Version { QWORD MajorVersion, MinorVersion, BuildVersion; };
+    Version GetFWVersion() const;
+    Version GetDriverVersion() const;
+    Version GetDLLVersion() const;
     
+    /// Write a single word to the QuickUSB device
+    inline void Write(uint16_t addr, uint8_t word) const {
+      std::vector<uint8_t> w(word);
+      try { Write(addr, w, 1); } catch (Exception& e) { throw e; }
+    }
     /// Write a set of words to the QuickUSB device
-    void Write(uint16_t addr, const std::vector<uint16_t>& words, uint8_t size) const;
+    void Write(uint16_t addr, std::vector<uint8_t>& words, uint16_t size) const;
     /// Receive a set of words from the QuickUSB device
-    std::vector<uint16_t> Fetch(uint16_t addr, uint8_t size) const;
+    std::vector<uint8_t> Fetch(uint16_t addr, uint16_t size) const;
 
   protected:
     bool fIsStopping;

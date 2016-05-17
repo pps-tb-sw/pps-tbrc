@@ -28,8 +28,9 @@ QuickUSBHandler::Init()
 
   // Print out the name of each module found
   char* namePtr = names;
+  std::ostringstream os;
   while (*namePtr!='\0') {
-    std::cout << "Found " << namePtr << std::endl;
+    os << "Found " << namePtr << "\n\t";
     namePtr += (strlen(namePtr)+1);
   }
 
@@ -39,7 +40,52 @@ QuickUSBHandler::Init()
     std::ostringstream e; e << "Cannot open " << names;
     throw Exception(__PRETTY_FUNCTION__, e.str().c_str());
   }
+
+  Version fw = GetFWVersion(), driver = GetDriverVersion(), dll = GetDLLVersion();
+  os << "FW version: " << fw.MajorVersion << "." << fw.MinorVersion << "." << fw.BuildVersion << "\n\t"
+     << "Driver version: " << driver.MajorVersion << "." << driver.MinorVersion << "." << driver.BuildVersion << "\n\t"
+     << "DLL version: " << dll.MajorVersion << "." << dll.MinorVersion << "." << dll.BuildVersion;
+  PrintInfo(os.str());
   
+}
+
+QuickUSBHandler::Version
+QuickUSBHandler::GetFWVersion() const
+{
+  QWORD major, minor, build;
+  QuickUsbGetFirmwareVersion(fHandle, &major, &minor, &build);
+
+  Version out;
+  out.MajorVersion = major;
+  out.MinorVersion = minor;
+  out.BuildVersion = build;
+  return out;
+}
+
+QuickUSBHandler::Version
+QuickUSBHandler::GetDriverVersion() const
+{
+  QWORD major, minor, build;
+  QuickUsbGetDriverVersion(&major, &minor, &build);
+
+  Version out;
+  out.MajorVersion = major;
+  out.MinorVersion = minor;
+  out.BuildVersion = build;
+  return out;
+}
+
+QuickUSBHandler::Version
+QuickUSBHandler::GetDLLVersion() const
+{
+  QWORD major, minor, build;
+  QuickUsbGetDllVersion(&major, &minor, &build);
+
+  Version out;
+  out.MajorVersion = major;
+  out.MinorVersion = minor;
+  out.BuildVersion = build;
+  return out;
 }
 
 void
@@ -48,14 +94,41 @@ QuickUSBHandler::Reset() const
 }
 
 void
-QuickUSBHandler::Write(uint16_t addr, const std::vector<uint16_t>& words, uint8_t size) const
+QuickUSBHandler::Write(uint16_t addr, std::vector<uint8_t>& words, uint16_t size) const
 {
+  uint8_t* data = &words[0];
+  int result = QuickUsbWriteCommand(fHandle, addr, data, size);
+  if (result==0) {
+    unsigned long error;
+    QuickUsbGetLastError(&error);
+    std::ostringstream os;
+    os << "Cannot write register 0x" << std::hex << addr << " on board " << std::dec << fHandle << "\n\t"
+       << "QuickUSB error: " << error;
+    throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+  }
 }
 
 
-std::vector<uint16_t>
-QuickUSBHandler::Fetch(uint16_t addr, uint8_t size) const
+std::vector<uint8_t>
+QuickUSBHandler::Fetch(uint16_t addr, uint16_t size) const
 {
-  std::vector<uint16_t> out;
+  std::vector<uint8_t> out;
+  uint8_t* data = new uint8_t[size];
+  int result = QuickUsbReadCommand(fHandle, addr, data, &size);
+  if (result==0) {
+    unsigned long error;
+    QuickUsbGetLastError(&error);
+    std::ostringstream os;
+    os << "Cannot fetch register 0x" << std::hex << addr << " on board " << std::dec << fHandle << "\n\t"
+       << "QuickUSB error: " << error;
+    throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+  }
+  for (unsigned short i=0; i<size; i++) { out.push_back(data[i]); }
+  delete [] data;
+  if (out.size()!=size) {
+    std::ostringstream os;
+    os << "Mismatch between the requested and retrieved words sizes: asked " << size << " and got " << out.size();
+    throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+  }
   return out;
 }

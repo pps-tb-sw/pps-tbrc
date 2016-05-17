@@ -1,17 +1,14 @@
 #include "FPGAHandler.h"
 
 FPGAHandler::FPGAHandler(int port, const char* dev) :
-  Client(port), /*USBHandler(dev),*/ QuickUSBHandler(),
+  Client(port), QuickUSBHandler(),
   fFilename(""), fIsFileOpen(false),
   fIsTDCInReadout(false)
 {
   try {
     QuickUSBHandler::Init();
+    RegisterTest();
   } catch (Exception& e) { e.Dump(); }
-  // Read Id code (0b10000100011100001101101011001110 = 0x8470DACE for HPTDCv1.3)
-  /*for (unsigned int i=0; i<NUM_HPTDC; i++) {
-    fTDC[i] = new TDC(i, this);
-  }*/
 }
 
 FPGAHandler::~FPGAHandler()
@@ -20,6 +17,23 @@ FPGAHandler::~FPGAHandler()
   for (unsigned int i=0; i<NUM_HPTDC; i++) {
     //if (fTDC[i]) delete fTDC[i];
   }
+}
+
+void
+FPGAHandler::RegisterTest() const
+{
+  std::vector<uint8_t> reg;
+  try {
+    reg = QuickUSBHandler::Fetch(0x70, 2);
+  } catch (Exception& e) { e.Dump(); }
+  if (reg[0]!=0x80 or reg[1]!=0x80) {
+    std::ostringstream os;
+    os << "Register test failed! got 0x" << std::hex << static_cast<unsigned int>(reg[0]) << " and 0x" << std::hex << static_cast<unsigned int>(reg[1]);
+    throw Exception(__PRETTY_FUNCTION__, os.str(), Fatal);
+  }
+  std::ostringstream os;
+  os << "Passed the register test (got 0x" << std::hex << static_cast<unsigned int>(reg[0]) << " and 0x" << std::hex << static_cast<unsigned int>(reg[1]) << ")";
+  PrintInfo(os.str());
 }
 
 void

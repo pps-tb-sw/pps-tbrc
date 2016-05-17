@@ -54,7 +54,9 @@ class FPGAHandler : public Client, private QuickUSBHandler
     /// Socket actor type retrieval method
     inline SocketType GetType() const { return DETECTOR; }
 
-  private:    
+  private:
+    void RegisterTest() const;
+
     std::string fFilename;
     std::ofstream fOutput;
     bool fIsFileOpen;
