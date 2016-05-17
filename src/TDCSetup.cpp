@@ -3,26 +3,37 @@
 void
 TDCSetup::SetConstantValues()
 {
+  SetTest(false);
+  SetEnableErrorMark(true);
+  SetEnableErrorBypass(false);
+  SetEnableError(0x7ff); // 11 bits of '1'
+
+  SetStrobeSelect(SS_NoStrobe);
+
+  SetEnableGlobalTrailer(false); // FIXME not yet discussed...
+  SetEnableGlobalHeader(false); // FIXME not yet discussed...
+
   SetReadoutSingleCycleSpeed(RSC_40Mbits_s); // FIXME don't care...
   SetSerialDelay(0x0); // FIXME maybe affected by the realistic tests
-  SetStrobeSelect(SS_LeadingEdge);
   SetReadoutSpeedSelect(RO_Fixed);
   SetTokenDelay(0x0); // FIXME maybe affected by the realistic tests
   
   SetEnableLocalTrailer(true); // FIXME not yet discussed...
   SetEnableLocalHeader(true); // FIXME not yet discussed...
-  SetEnableGlobalTrailer(true); // FIXME not yet discussed...
-  SetEnableGlobalHeader(true); // FIXME not yet discussed...
+  SetMaster(false);
+  SetEnableBytewise(false);
   
-  SetKeepToken(true);
-  SetMaster(true);
-  SetEnableBytewise(true);
-  
-  SetBypassInputs(true);
-  SetReadoutFIFOSize(256);
-  
+  SetBypassInputs(false); // bit 44
+  SetReadoutFIFOSize(256); // maximum
+  SetMaxEventSize(-1); // no limit
+  SetRejectFIFOFull(true);
+  SetEnableReadoutOccupancy(false);
+  SetEnableReadoutSeparator(false);
   SetEnableOverflowDetect(true);
-  SetEnableRelative(false);
+
+  SetKeepToken(true);
+  
+  SetEnableRelative(true);
   SetEnableAutomaticReject(false);
   
   /*SetEventCountOffset(0); // FIXME needs confirmation
@@ -55,16 +66,38 @@ TDCSetup::SetConstantValues()
   SetCoreClockDelay(false, 0x0);
   SetDLLClockDelay(false, 0x0);
   SetSerialClockSource(Serial_pll_clock_80);
+
   SetIOClockSource(IO_clock_40);
-  SetCoreClockSource(Core_pll_clock_80);
-  SetDLLClockSource(DLL_pll_clock_320);
+  SetCoreClockSource(Core_clock_40);
+  SetDLLClockSource(DLL_clock_40);
   
-  SetRollOver(0xFFF);
+  SetRollOver(0xfff); // 4095
   SetEnableTTLSerial(true);
   SetEnableTTLControl(true);
   SetEnableTTLReset(true);
   SetEnableTTLClock(false);
   SetEnableTTLHit(false);
+
+  SetEdgesPairing(false);
+  SetTriggerMatchingMode(true);
+  SetLeadingMode(true);
+  SetTrailingMode(true);
+
+  SetRCAdjustment(0, 0x7);
+  SetRCAdjustment(1, 0x7);
+  SetRCAdjustment(2, 0x4);
+  SetRCAdjustment(3, 0x2);
+
+  SetCoarseCountOffset(0);
+  SetTriggerCountOffset(0);
+  SetMatchWindow(198);
+  SetSearchWindow(198);
+  SetRejectCountOffset(0);
+  SetTDCId(0);
+  
+  SetEnableJTAGReadout(false);
+
+  SetSetupParity(true);
 }
 
 void

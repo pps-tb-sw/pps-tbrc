@@ -359,6 +359,12 @@ class TDCSetup : public TDCRegister
     inline uint16_t GetTriggerLatency() const {
       return ((GetCoarseCountOffset()-GetTriggerCountOffset())%(0x1<<12));
     }
+    inline void SetTDCId(const uint8_t id=0x0) {
+      SetBits(kTDCId, id, 4);
+    }
+    inline uint16_t GetTDCId() const {
+      return static_cast<uint16_t>(GetBits(kTDCId, 4));
+    }
     
     void Dump(int verb=1, std::ostream& os=std::cout) const;
     
@@ -606,6 +612,10 @@ class TDCSetup : public TDCRegister
     /// Enable LV TTL input on hit[31:0], otherwise uses LVDS input levels
     inline void SetEnableTTLHit(const bool th=true) {
       SetBits(kEnableTTLHit, th, 1);
+    }
+    inline void SetTest(const bool test=true) {
+      SetBits(kTestSelect, test, 1);
+      SetBits(kTestSelect+1, 0x7, 3);
     }
     
     // List of LSBs for all sub-words in the full ~700-bits setup word

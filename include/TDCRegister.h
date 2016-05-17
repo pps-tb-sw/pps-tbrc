@@ -4,7 +4,7 @@
 #include <math.h> // ceil
 #include <stdint.h>
 
-#define WORD_SIZE 32
+#define WORD_SIZE 8
 
 /**
  * \brief General register object to interact with a HPTDC chip
@@ -58,6 +58,7 @@ class TDCRegister
       if (i<0 or i>=fNumWords) return -1;
       return fWord[i];
     }
+    inline word_t* GetWords() const { return fWord; }
     /**
      * Return the number of words making up the full register word.
      * \brief Number of words in the register
@@ -79,7 +80,8 @@ class TDCRegister
           else if (j%8==0) os << "|";
           else if (j%4==0) os << " ";
         }
-        os << " <-" << std::setw(3) << i*WORD_SIZE << std::endl;
+        os << " <-" << std::setw(3) << i*WORD_SIZE 
+           << " -=- 0x" << std::hex << std::setw(4) << std::setfill('0') << fWord[i] << std::dec << std::endl;
       }
       os << std::endl;
     }

@@ -56,6 +56,7 @@ class FPGAHandler : public Client, private QuickUSBHandler
 
   private:
     void RegisterTest() const;
+    void SendSetupWord() const;
     void RetrieveSetupWord() const;
 
     std::string fFilename;

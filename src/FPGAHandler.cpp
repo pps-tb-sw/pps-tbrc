@@ -8,6 +8,7 @@ FPGAHandler::FPGAHandler(int port, const char* dev) :
   try {
     QuickUSBHandler::Init();
     RegisterTest();
+    SendSetupWord();
     RetrieveSetupWord();
   } catch (Exception& e) { e.Dump(); }
 }
@@ -38,6 +39,29 @@ FPGAHandler::RegisterTest() const
 }
 
 void
+FPGAHandler::SendSetupWord() const
+{
+  TDCSetup setup;
+  setup.DumpRegister();
+
+  const unsigned short size1 = 50, size2 = 31;
+
+  TDCRegister::word_t* word = setup.GetWords();
+  std::vector<uint8_t> part1, part2;
+  part1.push_back(0x50); // we set the register to write
+  for (unsigned int i=0; i<setup.GetNumWords(); i++) {
+    if (i<50) part1.push_back(word[i]);
+    else part2.push_back(word[i]);
+  }
+
+  //for (unsigned int i=0; i<part1.size(); i++) { std::cout << "--> " << std::dec << i << " :: " << std::hex << static_cast<unsigned short>(part1[i]) << std::endl; }
+  try {
+    QuickUSBHandler::Write(0x0, part1, size1+1);   usleep(100000);
+    QuickUSBHandler::Write(size1+1, part2, size2); usleep(100000);
+  } catch (Exception& e) { e.Dump(); }
+}
+
+void
 FPGAHandler::RetrieveSetupWord() const
 {
   std::vector<uint8_t> part1, part2;
@@ -49,9 +73,9 @@ FPGAHandler::RetrieveSetupWord() const
   for (unsigned int i=0; i<part1.size(); i++) {
     std::cout << std::dec << " setup1[" << i << "] = 0x" << std::hex << static_cast<unsigned int>(part1[i]) << std::endl;
   }
-  /*for (unsigned int i=0; i<part2.size(); i++) {
+  for (unsigned int i=0; i<part2.size(); i++) {
     std::cout << std::dec << " setup2[" << i << "] = 0x" << std::hex << static_cast<unsigned int>(part2[i]) << std::endl;
-  }*/
+  }
 }
 
 void
