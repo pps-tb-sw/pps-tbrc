@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
   h = new FPGAHandler(1987, "/dev/usbmon");
 
-  try {
+  /*try {
     //h->Connect();
     //h->SetTDCSetup(config);
     h->OpenFile();
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     if (nevts<0) break;
     total_nevts += nevts;
   }
-  cout << "Number of events collected: " << total_nevts << endl;
+  cout << "Number of events collected: " << total_nevts << endl;*/
   
   delete h;
   return 0;

@@ -34,7 +34,7 @@ class QuickUSBHandler
     
     /// Write a single word to the QuickUSB device
     inline void Write(uint16_t addr, uint8_t word) const {
-      std::vector<uint8_t> w(word);
+      std::vector<uint8_t> w; w.push_back(word);
       try { Write(addr, w, 1); } catch (Exception& e) { throw e; }
     }
     /// Write a set of words to the QuickUSB device

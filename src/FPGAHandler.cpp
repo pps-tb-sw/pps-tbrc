@@ -8,6 +8,7 @@ FPGAHandler::FPGAHandler(int port, const char* dev) :
   try {
     QuickUSBHandler::Init();
     RegisterTest();
+    RetrieveSetupWord();
   } catch (Exception& e) { e.Dump(); }
 }
 
@@ -34,6 +35,23 @@ FPGAHandler::RegisterTest() const
   std::ostringstream os;
   os << "Passed the register test (got 0x" << std::hex << static_cast<unsigned int>(reg[0]) << " and 0x" << std::hex << static_cast<unsigned int>(reg[1]) << ")";
   PrintInfo(os.str());
+}
+
+void
+FPGAHandler::RetrieveSetupWord() const
+{
+  std::vector<uint8_t> part1, part2;
+  try {
+    QuickUSBHandler::Write(0x0, 0x51);     usleep(100000);
+    part1 = QuickUSBHandler::Fetch(1, 50); usleep(100000);
+    part2 = QuickUSBHandler::Fetch(51, 31);
+  } catch (Exception& e) { e.Dump(); }
+  for (unsigned int i=0; i<part1.size(); i++) {
+    std::cout << std::dec << " setup1[" << i << "] = 0x" << std::hex << static_cast<unsigned int>(part1[i]) << std::endl;
+  }
+  /*for (unsigned int i=0; i<part2.size(); i++) {
+    std::cout << std::dec << " setup2[" << i << "] = 0x" << std::hex << static_cast<unsigned int>(part2[i]) << std::endl;
+  }*/
 }
 
 void

@@ -108,7 +108,6 @@ QuickUSBHandler::Write(uint16_t addr, std::vector<uint8_t>& words, uint16_t size
   }
 }
 
-
 std::vector<uint8_t>
 QuickUSBHandler::Fetch(uint16_t addr, uint16_t size) const
 {
