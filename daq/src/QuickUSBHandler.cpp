@@ -152,13 +152,28 @@ namespace DAQ
   void
   QuickUSBHandler::StopBulkTransfer()
   {
-    int result = QuickUsbStopStream(fHandle, fStreamId, false);
+    int result = QuickUsbStopStream(fHandle, fStreamId, true);
     if (result==0) {
       unsigned long error;
       QuickUsbGetLastError(&error);
       std::ostringstream os;
       os << "Cannot stop the bulk transfer with stream ID " << std::dec << static_cast<unsigned short>(fStreamId) << "\n\t"
          << "on the QuickUSB device " << std::dec << static_cast<unsigned short>(fHandle) << "\n\t"
+         << "QuickUSB error: " << error;
+      throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+    }
+    result = QuickUsbStopStream(fHandle, fStreamId, false);
+    
+    if (result!=0) return;
+
+    unsigned long error;
+    QuickUsbGetLastError(&error);
+    // if the stream has already finished shutting down
+    // we continue normally (not an error, the stream
+    // is to be stopped)
+    if (error!=QUICKUSB_ERROR_NOT_STREAMING) {
+      std::ostringstream os;
+      os << "Cannot stop the bulk transfer from buffer to file" << "\n\t"
          << "QuickUSB error: " << error;
       throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
     }

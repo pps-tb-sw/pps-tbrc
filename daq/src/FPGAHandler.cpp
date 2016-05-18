@@ -208,7 +208,7 @@ callback(PQBULKSTREAM stream)
         //std::cout << std::hex << word_32 << std::endl; //FIXME delete me!!
         TDCEvent w(word_32);
         //std::cout << w.GetEventType() << std::endl;
-        w.Dump();
+        //w.Dump();
         i = 0;
       }
       i++;
