@@ -11,18 +11,20 @@
 
 #include "TDCConstants.h"
 
-/**
- * \defgroup HPTDC HPTDC chip control
- */
-/**
- * \brief HPTDC object
- * \author Laurent Forthomme <laurent.forthomme@cern.ch>
- * \date 27 Apr 2015 
- * \ingroup HPTDC
- */
-class TDC
+namespace DAQ
 {
-  public:
+  /**
+   * \defgroup HPTDC HPTDC chip control
+   */
+  /**
+   * \brief HPTDC object
+   * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+   * \date 27 Apr 2015 
+   * \ingroup HPTDC
+   */
+  class TDC
+  {
+   public:
     /**
      * \brief TDC acquisition mode
      * \ingroup HPTDC
@@ -53,7 +55,7 @@ class TDC
       fStatus = ReadRegister<TDCStatus>(TDC_STATUS_REGISTER);
     }
     
-  private:
+   private:
     /// Set the setup word to the HPTDC internal setup register
     void SendConfiguration();
     /// Read the setup word from the HPTDC internal setup register
@@ -70,6 +72,7 @@ class TDC
     TDCControl fControl;
     TDCBoundaryScan fBS;
     TDCStatus fStatus;
-};
+  };
+}
 
 #endif

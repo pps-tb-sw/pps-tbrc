@@ -12,15 +12,17 @@
 
 //#define DEBUG
 
-/**
- * \brief Generic QuickUSB communication handler
- * \date 17 May 2016
- * \author Laurent Forthomme <laurent.forthomme@cern.ch>
- * \ingroup FPGA
- */
-class QuickUSBHandler
+namespace DAQ
 {
-  public:
+  /**
+   * \brief Generic QuickUSB communication handler
+   * \date 17 May 2016
+   * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+   * \ingroup FPGA
+   */
+  class QuickUSBHandler
+  {
+   public:
     QuickUSBHandler();
     virtual ~QuickUSBHandler();
     
@@ -44,13 +46,14 @@ class QuickUSBHandler
     void StartBulkTransfer(QVOIDRETURN callback(PQBULKSTREAM));
     void StopBulkTransfer();
 
-  protected:
+   protected:
     bool fIsStopping;
     
-  private:
+   private:
     std::string fDevice;
     QHANDLE fHandle;
     uint8_t fStreamId;
-};
+  };
+}
 
 #endif

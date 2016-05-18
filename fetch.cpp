@@ -5,7 +5,7 @@
 
 using namespace std;
 
-FPGAHandler* h = 0;
+DAQ::FPGAHandler* h = 0;
 int gEnd = 0;
 
 void CtrlC(int aSig) {
@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 {
   signal(SIGINT, CtrlC);
 
-  h = new FPGAHandler(1987, "/dev/usbmon");
+  h = new DAQ::FPGAHandler(1987, "/dev/usbmon");
   h->GetTDCControl().Dump();
   h->GetTDCStatus().Dump();
 
