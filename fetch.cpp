@@ -26,8 +26,9 @@ int main(int argc, char* argv[])
 
   try {
     h = new DAQ::FPGAHandler(1987, "/dev/usbmon");
-    h->GetTDCControl().Dump();
-    h->GetTDCStatus().Dump();
+    /*h->GetTDCControl().Dump();
+    h->GetTDCStatus().Dump();*/
+    //h->GetTDCSetup().Dump(2);
 
     //return 0;
     h->StartAcquisition();

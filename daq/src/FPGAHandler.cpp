@@ -10,6 +10,13 @@ namespace DAQ
     try {
       QuickUSBHandler::Init();
       RegisterTest();
+    } catch (Exception& e) { e.Dump(); }
+
+    // retrieve and reset the configuration
+    try {
+      RetrieveSetupWord();
+      //fSetupReg.Dump(2);
+      fSetupReg.SetConstantValues();
       SendSetupWord();
       RetrieveSetupWord();
     } catch (Exception& e) { e.Dump(); }
@@ -42,18 +49,13 @@ namespace DAQ
   
   void
   FPGAHandler::SendSetupWord() const
-  {
-    TDCSetup setup;
-    setup.DumpRegister();
-    setup.SetSearchWindow(200);
-    setup.SetMatchWindow(0);
-    
+  { 
     const unsigned short size1 = 50, size2 = 31;
     
-    TDCRegister::word_t* word = setup.GetWords();
+    TDCRegister::word_t* word = fSetupReg.GetWords();
     std::vector<uint8_t> part1, part2;
     part1.push_back(0x50); // we set the register to write
-    for (unsigned int i=0; i<setup.GetNumWords(); i++) {
+    for (unsigned int i=0; i<fSetupReg.GetNumWords(); i++) {
       if (i<50) part1.push_back(word[i]);
       else part2.push_back(word[i]);
     }
@@ -66,7 +68,7 @@ namespace DAQ
   }
   
   void
-  FPGAHandler::RetrieveSetupWord() const
+  FPGAHandler::RetrieveSetupWord()
   {
     std::vector<uint8_t> part1, part2;
     try {
@@ -74,12 +76,8 @@ namespace DAQ
       part1 = QuickUSBHandler::Fetch(1, 50); usleep(100000);
       part2 = QuickUSBHandler::Fetch(51, 31);
     } catch (Exception& e) { e.Dump(); }
-    /*for (unsigned int i=0; i<part1.size(); i++) {
-      std::cout << std::dec << " setup1[" << i << "] = 0x" << std::hex << static_cast<unsigned int>(part1[i]) << std::endl;
-    }
-    for (unsigned int i=0; i<part2.size(); i++) {
-      std::cout << std::dec << " setup2[" << i << "] = 0x" << std::hex << static_cast<unsigned int>(part2[i]) << std::endl;
-    }*/
+    part1.insert(part1.end(), part2.begin(), part2.end());
+    fSetupReg = TDCSetup(part1, true); // the bytes order is reversed
   }
   
   TDCControl
@@ -207,7 +205,7 @@ callback(PQBULKSTREAM stream)
         word_32 += word&0xffff;
         //std::cout << std::hex << word_32 << std::endl; //FIXME delete me!!
         TDCEvent w(word_32);
-        //std::cout << w.GetEventType() << std::endl;
+        if (w.GetType()!=0) std::cout << w.GetType() << std::endl;
         //w.Dump();
         i = 0;
       }

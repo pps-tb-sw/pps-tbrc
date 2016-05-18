@@ -46,11 +46,11 @@ namespace DAQ
       if (i<0 or i>=NUM_HPTDC) return 0;
       return fTDC[i];
     }
-    inline void SetTDCSetup(const TDCSetup& s) {
+    /*inline void SetTDCSetup(const TDCSetup& s) {
       for (unsigned int i=0; i<NUM_HPTDC; i++) {
         fTDC[i]->SetSetupRegister(s);
       }
-    }
+    }*/
     bool ErrorState();
     
     void StartAcquisition();
@@ -60,11 +60,14 @@ namespace DAQ
 
     TDCControl GetTDCControl() const;
     TDCStatus GetTDCStatus() const;
+    
+    inline void SetTDCSetup(const TDCSetup& s) { fSetupReg = s; SendSetupWord(); }
+    inline TDCSetup GetTDCSetup() const { return fSetupReg; }
 
    private:
     void RegisterTest() const;
     void SendSetupWord() const;
-    void RetrieveSetupWord() const;
+    void RetrieveSetupWord();
 
     std::string fFilename;
     std::ofstream fOutput;
@@ -72,6 +75,7 @@ namespace DAQ
     
     TDC* fTDC[NUM_HPTDC];
     bool fIsTDCInReadout;
+    TDCSetup fSetupReg;
   };
 }
 
