@@ -43,6 +43,8 @@ FPGAHandler::SendSetupWord() const
 {
   TDCSetup setup;
   setup.DumpRegister();
+  setup.SetSearchWindow(200);
+  setup.SetMatchWindow(0);
 
   const unsigned short size1 = 50, size2 = 31;
 

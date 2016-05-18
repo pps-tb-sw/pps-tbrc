@@ -131,3 +131,33 @@ QuickUSBHandler::Fetch(uint16_t addr, uint16_t size) const
   }
   return out;
 }
+
+void
+QuickUSBHandler::StartBulkTransfer(QVOIDRETURN callback(PQBULKSTREAM))
+{
+  const unsigned int num_buffers = 8, buffer_byte_size = 0x10000;
+  int result = QuickUsbReadBulkDataStartStream(fHandle, 0, num_buffers, buffer_byte_size, callback, 0, &fStreamId, 8, 4);
+  if (result==0) {
+    unsigned long error;
+    QuickUsbGetLastError(&error);
+    std::ostringstream os;
+    os << "Cannot start the bulk transfer on the QuickUSB device " << std::dec << fHandle << "\n\t"
+       << "QuickUSB error: " << error;
+    throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+  }
+}
+
+void
+QuickUSBHandler::StopBulkTransfer()
+{
+  int result = QuickUsbStopStream(fHandle, fStreamId, false);
+  if (result==0) {
+    unsigned long error;
+    QuickUsbGetLastError(&error);
+    std::ostringstream os;
+    os << "Cannot stop the bulk transfer with stream ID " << std::dec << fStreamId
+       << " on the QuickUSB device " << std::dec << fHandle << "\n\t"
+       << "QuickUSB error: " << error;
+    throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+  }
+}

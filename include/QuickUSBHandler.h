@@ -41,6 +41,8 @@ class QuickUSBHandler
     void Write(uint16_t addr, std::vector<uint8_t>& words, uint16_t size) const;
     /// Receive a set of words from the QuickUSB device
     std::vector<uint8_t> Fetch(uint16_t addr, uint16_t size) const;
+    void StartBulkTransfer(QVOIDRETURN callback(PQBULKSTREAM));
+    void StopBulkTransfer();
 
   protected:
     bool fIsStopping;
@@ -48,6 +50,7 @@ class QuickUSBHandler
   private:
     std::string fDevice;
     QHANDLE fHandle;
+    uint8_t fStreamId;
 };
 
 #endif

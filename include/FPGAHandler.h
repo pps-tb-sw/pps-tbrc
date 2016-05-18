@@ -24,7 +24,7 @@
  * \date 14 Apr 2015
  * \ingroup FPGA
  */
-class FPGAHandler : public Client, private QuickUSBHandler
+class FPGAHandler : public Client, public QuickUSBHandler
 {
   public:
     /// Bind to a FPGA through the USB protocol, and to the socket
