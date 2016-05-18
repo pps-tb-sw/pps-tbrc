@@ -24,14 +24,18 @@ int main(int argc, char* argv[])
 {
   signal(SIGINT, CtrlC);
 
-  h = new DAQ::FPGAHandler(1987, "/dev/usbmon");
-  h->GetTDCControl().Dump();
-  h->GetTDCStatus().Dump();
+  try {
+    h = new DAQ::FPGAHandler(1987, "/dev/usbmon");
+    h->GetTDCControl().Dump();
+    h->GetTDCStatus().Dump();
 
-  return 0;
-  h->StartAcquisition();
-  sleep(1);
-  h->StopAcquisition();
+    //return 0;
+    h->StartAcquisition();
+    sleep(1);
+    h->StopAcquisition();
+  } catch (Exception& e) {
+    e.Dump();
+  }
 
   /*try {
     //h->Connect();

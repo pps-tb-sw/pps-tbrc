@@ -9,7 +9,7 @@ namespace DAQ
   QuickUSBHandler::~QuickUSBHandler()
   {
     int ret;
-    if (fHandle!=NULL) {
+    if (fHandle!=0) {
       if ((ret=QuickUsbClose(fHandle))!=0) {
         std::ostringstream o;
         o << "Failed to release interface! Returned value: " << ret;
@@ -104,7 +104,7 @@ namespace DAQ
       unsigned long error;
       QuickUsbGetLastError(&error);
       std::ostringstream os;
-      os << "Cannot write register 0x" << std::hex << addr << " on board " << std::dec << fHandle << "\n\t"
+      os << "Cannot write register 0x" << std::hex << addr << " on board " << std::dec << static_cast<unsigned short>(fHandle) << "\n\t"
          << "QuickUSB error: " << error;
       throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
     }
@@ -120,7 +120,7 @@ namespace DAQ
       unsigned long error;
       QuickUsbGetLastError(&error);
       std::ostringstream os;
-      os << "Cannot fetch register 0x" << std::hex << addr << " on board " << std::dec << fHandle << "\n\t"
+      os << "Cannot fetch register 0x" << std::hex << addr << " on board " << std::dec << static_cast<unsigned short>(fHandle) << "\n\t"
          << "QuickUSB error: " << error;
       throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
     }
@@ -143,7 +143,7 @@ namespace DAQ
       unsigned long error;
       QuickUsbGetLastError(&error);
       std::ostringstream os;
-      os << "Cannot start the bulk transfer on the QuickUSB device " << std::dec << fHandle << "\n\t"
+      os << "Cannot start the bulk transfer on the QuickUSB device " << std::dec << static_cast<unsigned short>(fHandle) << "\n\t"
          << "QuickUSB error: " << error;
       throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
     }
@@ -157,8 +157,8 @@ namespace DAQ
       unsigned long error;
       QuickUsbGetLastError(&error);
       std::ostringstream os;
-      os << "Cannot stop the bulk transfer with stream ID " << std::dec << fStreamId
-         << " on the QuickUSB device " << std::dec << fHandle << "\n\t"
+      os << "Cannot stop the bulk transfer with stream ID " << std::dec << static_cast<unsigned short>(fStreamId) << "\n\t"
+         << "on the QuickUSB device " << std::dec << static_cast<unsigned short>(fHandle) << "\n\t"
          << "QuickUSB error: " << error;
       throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
     }
