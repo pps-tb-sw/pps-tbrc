@@ -56,6 +56,9 @@ class FPGAHandler : public Client, private QuickUSBHandler
     /// Socket actor type retrieval method
     inline SocketType GetType() const { return DETECTOR; }
 
+    TDCControl GetTDCControl() const;
+    TDCStatus GetTDCStatus() const;
+
   private:
     void RegisterTest() const;
     void SendSetupWord() const;

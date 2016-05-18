@@ -25,7 +25,10 @@ int main(int argc, char* argv[])
   signal(SIGINT, CtrlC);
 
   h = new FPGAHandler(1987, "/dev/usbmon");
+  h->GetTDCControl().Dump();
+  h->GetTDCStatus().Dump();
 
+  return 0;
   h->StartAcquisition();
   sleep(1);
   h->StopAcquisition();

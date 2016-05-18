@@ -1,6 +1,7 @@
 #ifndef TDCRegister_h
 #define TDCRegister_h
 
+#include <vector>
 #include <math.h> // ceil
 #include <stdint.h>
 
@@ -31,6 +32,11 @@ class TDCRegister
       fNumWords(ceil(size/WORD_SIZE)+1), fWordSize(size) {
       fWord = new word_t[fNumWords];
       for (unsigned int i=0; i<GetNumWords(); i++) { fWord[i] = r.fWord[i]; }
+    }
+    inline TDCRegister(const unsigned int size, const std::vector<uint8_t> words) :
+      fNumWords(ceil(size/WORD_SIZE)+1), fWordSize(size) {
+      fWord = new word_t[fNumWords];
+      for (unsigned int i=0; i<words.size(); i++) { SetWord(i, words[i]); }
     }
     inline virtual ~TDCRegister() {
       if (fWord) delete [] fWord;

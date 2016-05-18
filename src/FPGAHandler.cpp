@@ -72,12 +72,34 @@ FPGAHandler::RetrieveSetupWord() const
     part1 = QuickUSBHandler::Fetch(1, 50); usleep(100000);
     part2 = QuickUSBHandler::Fetch(51, 31);
   } catch (Exception& e) { e.Dump(); }
-  for (unsigned int i=0; i<part1.size(); i++) {
+  /*for (unsigned int i=0; i<part1.size(); i++) {
     std::cout << std::dec << " setup1[" << i << "] = 0x" << std::hex << static_cast<unsigned int>(part1[i]) << std::endl;
   }
   for (unsigned int i=0; i<part2.size(); i++) {
     std::cout << std::dec << " setup2[" << i << "] = 0x" << std::hex << static_cast<unsigned int>(part2[i]) << std::endl;
-  }
+  }*/
+}
+
+TDCControl
+FPGAHandler::GetTDCControl() const
+{
+  std::vector<uint8_t> word;
+  try {
+    QuickUSBHandler::Write(0x0, 0x52);     usleep(100000);
+    word = QuickUSBHandler::Fetch(1, 5);
+    return TDCControl(word);
+  } catch (Exception& e) { e.Dump(); }
+}
+
+TDCStatus
+FPGAHandler::GetTDCStatus() const
+{
+  std::vector<uint8_t> word;
+  try {
+    QuickUSBHandler::Write(0x0, 0x54);     usleep(100000);
+    word = QuickUSBHandler::Fetch(1, 8);
+    return TDCStatus(word);
+  } catch (Exception& e) { e.Dump(); }
 }
 
 void

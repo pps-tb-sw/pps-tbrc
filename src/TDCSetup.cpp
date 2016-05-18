@@ -106,7 +106,7 @@ TDCSetup::Dump(int verb, std::ostream& os) const
   os << "====================="
      << " TDC Setup register dump "
      << "====================" << std::endl;
-     if (verb>1) DumpRegister(os);
+  if (verb>1) DumpRegister(os);
   os << " Enabled errors:             ";
   for (unsigned int i=0; i<11; i++) {
     if (static_cast<bool>((GetEnableError()>>i)&0x1)) os << i << " ";

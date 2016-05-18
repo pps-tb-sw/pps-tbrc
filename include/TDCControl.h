@@ -24,6 +24,7 @@ class TDCControl : public TDCRegister
     inline TDCControl(const TDCControl& c) : TDCRegister(TDC_CONTROL_BITS_NUM, c) {
       SetConstantValues();
     }
+    inline TDCControl(const std::vector<uint8_t>& words) : TDCRegister(TDC_CONTROL_BITS_NUM, words) {;}
     
     inline void SetEnablePattern(const EnablePattern& ep) {
       SetBits(kEnablePattern, static_cast<unsigned int>(ep), 4);
@@ -52,7 +53,11 @@ class TDCControl : public TDCRegister
       os << "===================="
          << " TDC Control register dump "
          << "===================" << std::endl;
-         if (verb>1) DumpRegister(os);
+      if (verb>1) DumpRegister(os);
+      os << " EnablePattern: " << GetEnablePattern() << std::endl
+         << " Global reset: " << GetGlobalReset() << std::endl
+         << " DLL reset: " << GetDLLReset() << std::endl
+         << " PLL reset: " << GetPLLReset() << std::endl;
     }
     inline void SetConstantValues() {
       EnableAllChannels();
