@@ -9,8 +9,9 @@
 #include <fstream>
 
 #define NUM_HPTDC 4 // number of HPTDC per FPGA readout
-#define FPGA_VENDOR_ID 42
-#define FPGA_DEVICE_ID 12
+
+//static bool writing;
+void callback(PQBULKSTREAM stream);
 
 /**
  * \defgroup FPGA FPGA board control
@@ -24,7 +25,7 @@
  * \date 14 Apr 2015
  * \ingroup FPGA
  */
-class FPGAHandler : public Client, public QuickUSBHandler
+class FPGAHandler : public Client, private QuickUSBHandler
 {
   public:
     /// Bind to a FPGA through the USB protocol, and to the socket
@@ -50,7 +51,8 @@ class FPGAHandler : public Client, public QuickUSBHandler
     }
     bool ErrorState();
     
-    int ReadBuffer();
+    void StartAcquisition();
+    void StopAcquisition();
     /// Socket actor type retrieval method
     inline SocketType GetType() const { return DETECTOR; }
 

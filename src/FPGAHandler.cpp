@@ -114,17 +114,20 @@ FPGAHandler::OpenFile()
   }*/
 }
 
-int
-FPGAHandler::ReadBuffer()
+void
+FPGAHandler::StartAcquisition()
 {
   TDCEventCollection ev;
   unsigned int nevts = 0;
   
+  QuickUSBHandler::StartBulkTransfer(callback);
+
   if (QuickUSBHandler::fIsStopping) {
     std::cout << __PRETTY_FUNCTION__
               << " QuickUSB handler in a stopping state! Finishing the readout."
               << std::endl;
-    return -1;
+    StopAcquisition();
+    return;
   }
   
   /*for (unsigned int i=0; i<NUM_HPTDC; i++) {
@@ -134,7 +137,13 @@ FPGAHandler::ReadBuffer()
       fOutput.write((char*)&(*e), sizeof(TDCEvent));
     }
   }*/
-  return nevts;
+  //return nevts;
+}
+
+void
+FPGAHandler::StopAcquisition()
+{
+  QuickUSBHandler::StopBulkTransfer();
 }
 
 void
@@ -143,3 +152,44 @@ FPGAHandler::CloseFile()
   if (fIsFileOpen) fOutput.close();
 }
 
+static bool writing = false;
+
+void
+callback(PQBULKSTREAM stream)
+{
+  if (!stream) return;
+
+  unsigned int filtered = 0;
+  if (stream->Error) {
+    std::cout << "--> CR: ERROR! Failed with error " << stream->Error << " (" << stream->BytesTransferred << " of " << stream->BytesRequested << " bytes)" << std::endl;
+    return;
+  }
+
+  uint32_t word_32 = 0x0;
+
+  while (true) {
+    if (writing) continue;
+
+    writing = true;
+    unsigned int i = 0;
+    for (unsigned int j=0; j<0x10000/2; j++) {
+      unsigned short word = (stream->Buffer[2*j]<<8)+stream->Buffer[2*j+1]; // group the two bytes into a 16-bit word
+      if (word==0x00ff) { filtered++; continue; }
+      if (i==0) {
+        word_32 = word<<16;
+      }
+      else {
+        word_32 += word&0xffff;
+        //std::cout << std::hex << word_32 << std::endl; //FIXME delete me!!
+        TDCEvent w(word_32);
+        //std::cout << w.GetEventType() << std::endl;
+        w.Dump();
+        i = 0;
+      }
+      i++;
+    }
+    writing = false;
+    return;
+  }
+  std::cout << "haha -> " << stream->StreamID << " --- " << stream->RequestID << " --> filtered " << filtered << std::endl;
+}

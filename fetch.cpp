@@ -20,42 +20,15 @@ void CtrlC(int aSig) {
   gEnd++;
 }
 
-static bool writing = false;
-
-void
-callback(PQBULKSTREAM stream)
-{
-  if (!stream) return;
-
-  unsigned int filtered = 0;
-  if (stream->Error) {
-    std::cout << "--> CR: ERROR! Failed with error " << stream->Error << " (" << stream->BytesTransferred << " of " << stream->BytesRequested << " bytes)" << std::endl;
-    return;
-  }
-  while (true) {
-    if (writing) continue;
-
-    writing = true;
-    for (unsigned int j=0; j<0x10000/2; j++) {
-      unsigned short word = (stream->Buffer[2*j]<<8)+stream->Buffer[2*j+1]; // group the two bytes into a 16-bit word
-      if (word==0x00ff) { filtered++; continue; }
-      std::cout << std::hex << word << std::endl; //FIXME delete me!!
-    }
-    writing = false;
-    return;
-  }
-  std::cout << "haha -> " << stream->StreamID << " --- " << stream->RequestID << " --> filtered " << filtered << std::endl;
-}
-
 int main(int argc, char* argv[])
 {
   signal(SIGINT, CtrlC);
 
   h = new FPGAHandler(1987, "/dev/usbmon");
 
-  h->StartBulkTransfer(callback);
+  h->StartAcquisition();
   sleep(1);
-  h->StopBulkTransfer();
+  h->StopAcquisition();
 
   /*try {
     //h->Connect();
