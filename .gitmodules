@@ -4,4 +4,5 @@
 	url = https://github.com/lucabaldini/xpedaq.git
 [submodule "mblibs"]
 	path = mblib
-	url = git@github.com:pps-tb-sw/motherboard-lib.git
+	#url = git@github.com:pps-tb-sw/motherboard-lib.git
+	url = https://github.com/pps-tb-sw/motherboard-lib.git
