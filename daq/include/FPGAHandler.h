@@ -17,17 +17,19 @@ void callback(PQBULKSTREAM stream);
  * \defgroup FPGA FPGA board control
  */
 
-/**
- * Main driver for a homebrew FPGA designed for the timing detectors' HPTDC
- * chip readout.
- * \brief Driver for timing detectors' FPGA readout
- * \author Laurent Forthomme <laurent.forthomme@cern.ch>
- * \date 14 Apr 2015
- * \ingroup FPGA
- */
-class FPGAHandler : public Client, private QuickUSBHandler
+namespace DAQ
 {
-  public:
+  /**
+   * Main driver for a homebrew FPGA designed for the timing detectors' HPTDC
+   * chip readout.
+   * \brief Driver for timing detectors' FPGA readout
+   * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+   * \date 14 Apr 2015
+   * \ingroup FPGA
+   */
+  class FPGAHandler : public Client, private QuickUSBHandler
+  {
+   public:
     /// Bind to a FPGA through the USB protocol, and to the socket
     FPGAHandler(int port, const char* dev);
     ~FPGAHandler();
@@ -59,7 +61,7 @@ class FPGAHandler : public Client, private QuickUSBHandler
     TDCControl GetTDCControl() const;
     TDCStatus GetTDCStatus() const;
 
-  private:
+   private:
     void RegisterTest() const;
     void SendSetupWord() const;
     void RetrieveSetupWord() const;
@@ -70,6 +72,7 @@ class FPGAHandler : public Client, private QuickUSBHandler
     
     TDC* fTDC[NUM_HPTDC];
     bool fIsTDCInReadout;
-};
+  };
+}
 
 #endif
