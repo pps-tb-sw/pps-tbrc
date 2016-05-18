@@ -22,7 +22,7 @@ include_directories("${PROJECT_SOURCE_DIR}/mblib/include")
 include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${QUSB_LOCATION}")
 
-# Here have DAQ
+# Here have DAQ components
 add_subdirectory(mblib)
 add_subdirectory(daq)
 
@@ -38,8 +38,10 @@ set_property(TARGET ppsRun PROPERTY LINK_FLAGS "-lsqlite3")
 add_executable(listener listener.cpp $<TARGET_OBJECTS:src_lib>)
 set_property(TARGET listener PROPERTY LINK_FLAGS "-lsqlite3")
 
-add_executable(ppsFetch fetch.cpp $<TARGET_OBJECTS:src_lib> $<TARGET_OBJECTS:daq_lib> $<TARGET_OBJECTS:mb_lib>)
+#add_executable(ppsFetch fetch.cpp $<TARGET_OBJECTS:src_lib> $<TARGET_OBJECTS:daq_lib> $<TARGET_OBJECTS:mb_lib>)
+add_executable(ppsFetch fetch.cpp $<TARGET_OBJECTS:src_lib> $<TARGET_OBJECTS:daq_lib>)
 set_property(TARGET ppsFetch PROPERTY LINK_FLAGS "-ltinyxml2 -lsqlite3 -L${QUSB_LIB_LOCATION} -lquickusb -Wl,-R${QUSB_LIB_LOCATION}")
+target_link_libraries(ppsFetch mb_lib)
 
 # Copy the XML configuration files to the config/ folder
 file(GLOB config_files RELATIVE ${PROJECT_SOURCE_DIR} config/*.xml)
