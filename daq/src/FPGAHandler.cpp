@@ -205,7 +205,9 @@ callback(PQBULKSTREAM stream)
         word_32 += word&0xffff;
         //std::cout << std::hex << word_32 << std::endl; //FIXME delete me!!
         TDCEvent w(word_32);
-        if (w.GetType()!=0) std::cout << w.GetType() << std::endl;
+        w.Dump();
+        //if (w.GetType()!=0) std::cout << w.GetType() << std::endl;
+        //if (w.GetType()==TDCEvent::TDCMeasurement) std::cout << w.IsTrailing() << "\t" << w.GetTime() << std::endl;
         //w.Dump();
         i = 0;
       }
