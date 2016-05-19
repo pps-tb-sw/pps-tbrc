@@ -97,6 +97,59 @@ namespace DAQ
   }
 
   void
+  QuickUSBHandler::DumpConfigValues(std::ostream& os) const
+  {
+    uint16_t reg;
+    os << std::hex;
+    try {
+      reg = GetConfigRegister(kWordWide);       os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kWordWide << "\n\t";
+      reg = GetConfigRegister(kDataAddress);    os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kDataAddress << "\n\t";
+      reg = GetConfigRegister(kFIFOConfig);     os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kFIFOConfig << "\n\t";
+      reg = GetConfigRegister(kFPGAType);       os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kFPGAType << "\n\t";
+      reg = GetConfigRegister(kCPUConfig);      os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kCPUConfig << "\n\t";
+      reg = GetConfigRegister(kSPIConfig);      os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kSPIConfig << "\n\t";
+      reg = GetConfigRegister(kSlaveFIFOFlags); os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kSlaveFIFOFlags << "\n\t";
+      reg = GetConfigRegister(kI2CTL);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kI2CTL << "\n\t";
+      reg = GetConfigRegister(kPortA);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortA << "\n\t";
+      reg = GetConfigRegister(kPortB);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortB << "\n\t";
+      reg = GetConfigRegister(kPortC);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortC << "\n\t";
+      reg = GetConfigRegister(kPortD);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortD << "\n\t";
+      reg = GetConfigRegister(kPortE);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortE << "\n\t";
+      reg = GetConfigRegister(kPortAConfig);    os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortAConfig << "\n\t";
+      reg = GetConfigRegister(kPinFlags);       os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPinFlags << "\n\t";
+      reg = GetConfigRegister(kVersionSpeed);   os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kVersionSpeed << "\n\t";
+      reg = GetConfigRegister(kTimeoutHigh);    os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kTimeoutHigh << "\n\t";
+      reg = GetConfigRegister(kTimeoutLow);     os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kTimeoutLow;
+    } catch (Exception& e) { e.Dump(); }
+    os << std::dec;
+  }
+
+  void
+  QuickUSBHandler::DumpDefaultConfigValues(std::ostream& os) const
+  {
+    uint16_t reg;
+    os << std::hex;
+    try {
+      reg = GetDefaultConfigRegister(kWordWide);       os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kWordWide << "\n\t";
+      reg = GetDefaultConfigRegister(kDataAddress);    os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kDataAddress << "\n\t";
+      reg = GetDefaultConfigRegister(kFIFOConfig);     os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kFIFOConfig << "\n\t";
+      reg = GetDefaultConfigRegister(kFPGAType);       os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kFPGAType << "\n\t";
+      reg = GetDefaultConfigRegister(kCPUConfig);      os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kCPUConfig << "\n\t";
+      reg = GetDefaultConfigRegister(kSPIConfig);      os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kSPIConfig << "\n\t";
+      reg = GetDefaultConfigRegister(kSlaveFIFOFlags); os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kSlaveFIFOFlags << "\n\t";
+      reg = GetDefaultConfigRegister(kI2CTL);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kI2CTL << "\n\t";
+      reg = GetDefaultConfigRegister(kPortA);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortA << "\n\t";
+      reg = GetDefaultConfigRegister(kPortB);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortB << "\n\t";
+      reg = GetDefaultConfigRegister(kPortC);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortC << "\n\t";
+      reg = GetDefaultConfigRegister(kPortD);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortD << "\n\t";
+      reg = GetDefaultConfigRegister(kPortE);          os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortE << "\n\t";
+      reg = GetDefaultConfigRegister(kPortAConfig);    os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPortAConfig << "\n\t";
+      reg = GetDefaultConfigRegister(kPinFlags);       os << "  0x" << std::setw(4) << std::setfill('0') << reg << " = " << std::bitset<16>(reg) << " <- register " << kPinFlags;
+    } catch (Exception& e) { e.Dump(); }
+    os << std::dec;
+  }
+
+  void
   QuickUSBHandler::Configure() const
   {
     //QuickUsbReadDefault(fHandle, kFIFOConfig, &bitvalue);
@@ -105,7 +158,8 @@ namespace DAQ
     try {
       SetWordWide(k8bits);
       //SetDataAddress(0x1ff, true, true); // increment ; enable address bus
-      SetFIFOConfig(0x82); // 0x82 = 0b0000.0000.1000.0010
+      //SetFIFOConfig(0x82); // 0x82 = 0b0000.0000.1000.0010
+      SetFIFOConfig(0xa2); // 0xa2 = 0b0000.0000.1010.0010
       SetCPUConfig((kCLKOUTdisable|kCLKINVenable|kCLKSPD12MHz|kUSBFullSpeedAllow)+0x10); // 0x8012 = 0b1000.0000.0001.0010
       os << "Hardware revision: " << GetHWRevision() << "\n\t"
          << "FPGA type: " << GetFPGAType() << "\n\t"
@@ -152,6 +206,7 @@ namespace DAQ
          << "QuickUSB error: " << error;
       throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
     }
+    usleep(10000); // 10 ms delay after every register writing
   }
   
   std::vector<uint8_t>
@@ -243,6 +298,31 @@ namespace DAQ
       case QuickUSBHandler::CY7C68013CD: os << "CY7C68013 Rev C/D"; break;
       case QuickUSBHandler::CY7C68013E:  os << "CY7C68013 Rev E"; break;
       default:                           os << "Unknown Revision"; break;
+    }
+    return os;
+  }
+
+  std::ostream&
+  operator<<(std::ostream& os, const QuickUSBHandler::SettingsRegister& s) {
+    switch (s) {
+      case QuickUSBHandler::kWordWide:       os << (unsigned short)s << ":SETTING_WORDWIDE"; break;
+      case QuickUSBHandler::kDataAddress:    os << (unsigned short)s << ":SETTING_DATAADDRESS"; break;
+      case QuickUSBHandler::kFIFOConfig:     os << (unsigned short)s << ":SETTING_FIFO_CONFIG"; break;
+      case QuickUSBHandler::kFPGAType:       os << (unsigned short)s << ":SETTING_FPGATYPE"; break;
+      case QuickUSBHandler::kCPUConfig:      os << (unsigned short)s << ":SETTING_CPUCONFIG"; break;
+      case QuickUSBHandler::kSPIConfig:      os << (unsigned short)s << ":SETTING_SPICONFIG"; break;
+      case QuickUSBHandler::kSlaveFIFOFlags: os << (unsigned short)s << ":SETTING_SLAVEFIFOFLAGS"; break;
+      case QuickUSBHandler::kI2CTL:          os << (unsigned short)s << ":SETTING_I2CTL"; break;
+      case QuickUSBHandler::kPortA:          os << (unsigned short)s << ":SETTING_PORTA"; break;
+      case QuickUSBHandler::kPortB:          os << (unsigned short)s << ":SETTING_PORTB"; break;
+      case QuickUSBHandler::kPortC:          os << (unsigned short)s << ":SETTING_PORTC"; break;
+      case QuickUSBHandler::kPortD:          os << (unsigned short)s << ":SETTING_PORTD"; break;
+      case QuickUSBHandler::kPortE:          os << (unsigned short)s << ":SETTING_PORTE"; break;
+      case QuickUSBHandler::kPortAConfig:    os << (unsigned short)s << ":SETTING_PORTACCFG"; break;
+      case QuickUSBHandler::kPinFlags:       os << (unsigned short)s << ":SETTING_PINFLAGS"; break;
+      case QuickUSBHandler::kVersionSpeed:   os << (unsigned short)s << ":SETTING_VERSIONSPEED"; break;
+      case QuickUSBHandler::kTimeoutHigh:    os << (unsigned short)s << ":SETTING_TIMEOUT_HIGH"; break;
+      case QuickUSBHandler::kTimeoutLow:     os << (unsigned short)s << ":SETTING_TIMEOUT_LOW"; break;
     }
     return os;
   }

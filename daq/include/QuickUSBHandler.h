@@ -6,6 +6,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <vector>
+#include <unistd.h> // usleep
+#include <bitset>
+
 #include "QuickUSB.h"
 
 #include "Exception.h"
@@ -64,6 +67,8 @@ namespace DAQ
     void StopBulkTransfer();
 
    protected:
+    void DumpConfigValues(std::ostream& os=std::cout) const;
+    void DumpDefaultConfigValues(std::ostream& os=std::cout) const;
     bool fIsStopping;
     
    private:
@@ -87,6 +92,7 @@ namespace DAQ
       kTimeoutHigh    = 0x12,
       kTimeoutLow     = 0x13
     };
+    friend std::ostream& operator<<(std::ostream& out, const SettingsRegister& s);
 
     /// Configure the board with the initial settings
     void Configure() const;
@@ -111,7 +117,22 @@ namespace DAQ
         unsigned long error;
         QuickUsbGetLastError(&error);
         std::ostringstream os;
-        os << "Failed to set the configuration register 0x" << std::hex << reg << " to 0x" << word << "\n\t"
+        os << "Failed to retrieve the configuration register 0x" << std::hex << reg << " to 0x" << word << "\n\t"
+           << "QuickUSB error: " << error;
+        throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
+      }
+      return word;
+    }
+
+    /// Retrieve a single default configuration register from the board
+    inline uint16_t GetDefaultConfigRegister(SettingsRegister reg) const {
+      uint16_t word = 0x0;
+      int res = QuickUsbReadDefault(fHandle, reg, &word);
+      if (res==0) {
+        unsigned long error;
+        QuickUsbGetLastError(&error);
+        std::ostringstream os;
+        os << "Failed to retrieve the default configuration register 0x" << std::hex << reg << " to 0x" << word << "\n\t"
            << "QuickUSB error: " << error;
         throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
       }

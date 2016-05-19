@@ -9,6 +9,15 @@ namespace DAQ
   {
     try {
       QuickUSBHandler::Init();
+
+      std::ostringstream os1; os1 << "Configuration values retrieved for the QuickUSB board operations:" << "\n\t";
+      QuickUSBHandler::DumpConfigValues(os1);
+      PrintInfo(os1.str());
+
+      std::ostringstream os2; os2 << "Default configurations values retrieved for the QuickUSB board operations:" << "\n\t";
+      QuickUSBHandler::DumpDefaultConfigValues(os2);
+      PrintInfo(os2.str());
+
       RegisterTest();
     } catch (Exception& e) { e.Dump(); }
 
@@ -35,8 +44,12 @@ namespace DAQ
   {
     std::vector<uint8_t> reg;
     try {
-      reg = QuickUSBHandler::Fetch(0x70, 2);
+      //reg = QuickUSBHandler::Fetch(0x70, 2);
+      reg = QuickUSBHandler::Fetch(0x70, 1);
     } catch (Exception& e) { e.Dump(); }
+    std::cout << std::hex << (unsigned short)reg[0] << std::endl;
+    return;
+    //if (reg[0]!=0x80 or reg[1]!=0x80) {
     if (reg[0]!=0x80 or reg[1]!=0x80) {
       std::ostringstream os;
       os << "Register test failed! got 0x" << std::hex << static_cast<unsigned int>(reg[0]) << " and 0x" << std::hex << static_cast<unsigned int>(reg[1]);
@@ -62,8 +75,8 @@ namespace DAQ
     
     //for (unsigned int i=0; i<part1.size(); i++) { std::cout << "--> " << std::dec << i << " :: " << std::hex << static_cast<unsigned short>(part1[i]) << std::endl; }
     try {
-      QuickUSBHandler::Write(0x0, part1, size1+1);   usleep(100000);
-      QuickUSBHandler::Write(size1+1, part2, size2); usleep(100000);
+      QuickUSBHandler::Write(0x0, part1, size1+1); 
+      QuickUSBHandler::Write(size1+1, part2, size2); 
     } catch (Exception& e) { e.Dump(); }
   }
   
@@ -72,8 +85,8 @@ namespace DAQ
   {
     std::vector<uint8_t> part1, part2;
     try {
-      QuickUSBHandler::Write(0x0, 0x51);     usleep(100000);
-      part1 = QuickUSBHandler::Fetch(1, 50); usleep(100000);
+      QuickUSBHandler::Write(0x0, 0x51); 
+      part1 = QuickUSBHandler::Fetch(1, 50); 
       part2 = QuickUSBHandler::Fetch(51, 31);
     } catch (Exception& e) { e.Dump(); }
     part1.insert(part1.end(), part2.begin(), part2.end());
@@ -85,7 +98,7 @@ namespace DAQ
   {
     std::vector<uint8_t> word;
     try {
-      QuickUSBHandler::Write(0x0, 0x52);     usleep(100000);
+      QuickUSBHandler::Write(0x0, 0x52); 
       word = QuickUSBHandler::Fetch(1, 5);
       return TDCControl(word);
     } catch (Exception& e) { e.Dump(); }
@@ -96,7 +109,7 @@ namespace DAQ
   {
     std::vector<uint8_t> word;
     try {
-      QuickUSBHandler::Write(0x0, 0x54);     usleep(100000);
+      QuickUSBHandler::Write(0x0, 0x54); 
       word = QuickUSBHandler::Fetch(1, 8);
       return TDCStatus(word);
     } catch (Exception& e) { e.Dump(); }
