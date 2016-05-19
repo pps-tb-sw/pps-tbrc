@@ -3,6 +3,6 @@
 	#url = git@github.com:lucabaldini/xpedaq.git
 	url = https://github.com/lucabaldini/xpedaq.git
 [submodule "mblibs"]
-	path = mblib
+	path = external/mblib
 	#url = git@github.com:pps-tb-sw/motherboard-lib.git
 	url = https://github.com/pps-tb-sw/motherboard-lib.git

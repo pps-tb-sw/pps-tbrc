@@ -6,16 +6,16 @@ set(GCC_COMPILE_FLAGS "-Wall -fPIC -O2 -g -lsqlite3")
 set(GCC_LINK_FLAGS "-lsqlite3")
 set(QUSB_LOCATION "${PROJECT_SOURCE_DIR}/external/xpedaq/quickusb-2.15.2/")
 set(QUSB_LIB_LOCATION "${QUSB_LOCATION}/linux/lib/x86_64/")
+set(MB_LIB_LOCATION "${PROJECT_SOURCE_DIR}/external/mblib/")
 
 add_definitions(${GCC_COMPILE_FLAGS})
 
 # Here have DAQ components
+add_subdirectory(external)
 file(GLOB fpga_sources src/*Handler.cpp src/TDC.cpp)
-link_directories("${PROJECT_SOURCE_DIR}/mblib")
 add_library(daq_lib OBJECT ${fpga_sources})
 set_property(TARGET daq_lib PROPERTY LINK_FLAGS "-ltinyxml2 -lsqlite3 -L${QUSB_LIB_LOCATION} -lquickusb -Wl,-R${QUSB_LIB_LOCATION}")
 #add_subdirectory(mblib)
-add_subdirectory(external)
 
 # File reader
 file(GLOB reader_sources ${PROJECT_SOURCE_DIR}/src/File*.cpp)
@@ -26,8 +26,8 @@ list(REMOVE_ITEM sources ${fpga_sources})
 add_library(src_lib OBJECT ${sources})
 set_property(TARGET src_lib PROPERTY LINK_FLAGS "-lsqlite3")
 
-include_directories("${PROJECT_SOURCE_DIR}/mblib/include")
 include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${MB_LIB_LOCATION}/include")
 include_directories("${QUSB_LOCATION}")
 
 # Here have tests
