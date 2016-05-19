@@ -30,9 +30,9 @@ int main(int argc, char* argv[])
     h->GetTDCStatus().Dump();*/
     //h->GetTDCSetup().Dump(2);
 
-    return 0;
+    //return 0;
     h->StartAcquisition();
-    sleep(1);
+    usleep(100000);
     h->StopAcquisition();
   } catch (Exception& e) {
     e.Dump();

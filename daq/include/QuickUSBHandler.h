@@ -34,13 +34,18 @@ namespace DAQ
       bool WriteFIFOFull, WriteFIFOEmpty, RDY1, ReadFIFOFull, ReadFIFOEmpty, RDY0;
       friend std::ostream& operator<<(std::ostream& out, const FIFOFlags& ff);
     };
+    enum FPGAType { AlteraPassiveSerial=0, XilinxSlaveSerial=1 };
+    friend std::ostream& operator<<(std::ostream& out, const FPGAType& sp);
 
     void Init();
     void Reset() const;
 
     struct Version { QWORD MajorVersion, MinorVersion, BuildVersion; };
+    /// Read the QuickUSB firmware revision
     Version GetFWVersion() const;
+    /// Read the QuickUSB driver revision
     Version GetDriverVersion() const;
+    /// Read the QuickUSB library revision
     Version GetDLLVersion() const;
     
     /// Write a single word to the QuickUSB device
@@ -52,7 +57,10 @@ namespace DAQ
     void Write(uint16_t addr, std::vector<uint8_t>& words, uint16_t size) const;
     /// Receive a set of words from the QuickUSB device
     std::vector<uint8_t> Fetch(uint16_t addr, uint16_t size) const;
+    /// Start the data collection
+    /// \param[inout] callback Callback function called at the end of each data retrieval by a process
     void StartBulkTransfer(QVOIDRETURN callback(PQBULKSTREAM));
+    /// Stop the data collection
     void StopBulkTransfer();
 
    protected:
@@ -80,8 +88,10 @@ namespace DAQ
       kTimeoutLow     = 0x13
     };
 
+    /// Configure the board with the initial settings
     void Configure() const;
 
+    /// Set a configuration register on the board
     inline void SetConfigRegister(SettingsRegister reg, const uint16_t& word) const {
       int res = QuickUsbWriteSetting(fHandle, reg, word);
       if (res==0) {
@@ -93,6 +103,7 @@ namespace DAQ
         throw Exception(__PRETTY_FUNCTION__, os.str(), JustWarning);
       }
     }
+    /// Retrieve a single configuration register from the board
     inline uint16_t GetConfigRegister(SettingsRegister reg) const {
       uint16_t word = 0x0;
       int res = QuickUsbReadSetting(fHandle, reg, &word);
@@ -108,18 +119,25 @@ namespace DAQ
     }
 
     enum WordWide { k8bits=0, k16bits=1 };
+    /// Set the high-speed port data width (8 or 16 bits)
     inline void SetWordWide(const WordWide& ww) const {
       try { SetConfigRegister(kWordWide, ww); } catch (...) { throw; }
     }
 
-    inline void SetDataAddress(uint16_t addr, bool increment=false, bool enable_addr_bus=false) const { 
-      try { SetConfigRegister(kDataAddress, (addr&0x1ff)+((!enable_addr_bus)<<14)+((!increment)<<15)); } catch (...) { throw; }
+    /// Set the data bus starting address
+    /// \param[in] increment Auto increment the bus address after each data transaction?
+    /// \param[in] enable_addr_bus Enable the address bus?
+    inline void SetDataAddress(uint16_t addr, bool increment=false, bool enable_addr_bus=false) const {
+      uint16_t word = (addr&0x1ff)+((!enable_addr_bus)<<14)+((!increment)<<15);
+      try { SetConfigRegister(kDataAddress, word); } catch (...) { throw; }
     }
     inline void SetFIFOConfig(uint16_t word) const {
       try { SetConfigRegister(kFIFOConfig, word); } catch (...) { throw; }
     }
 
-    enum FPGAType { kAlteraPassiveSerial=0, kXilinxSlaveSerial=1 };
+    /// Get the FPGA configuration scheme
+    inline FPGAType GetFPGAType() const { try { return static_cast<FPGAType>(GetConfigRegister(kFPGAType)&0x1); } catch (...) { throw; } }
+    /// Set the FPGA configuration scheme
     inline void SetFPGAType(const FPGAType ft) const {
       try { SetConfigRegister(kFPGAType, static_cast<uint16_t>(ft)&0x1); } catch (...) { throw; }
     }
@@ -141,8 +159,11 @@ namespace DAQ
       kMISOPIN5=0x0, kMISOPIN2=0x20,
       kGPIFA8gpio=0x0, kGPIFA8gfiadr8=0x8000
     };
+    /// Configure the SPI interface
     inline void SetSPIConfig(uint16_t c) const { try { SetConfigRegister(kSPIConfig, c); } catch (...) { throw; } }
 
+    /// Get the slave FIFO flag status
+    /// \note These flags are only significant when the FX2 is in slave FIFO mode
     inline FIFOFlags GetSlaveFIFOFlags() const {
       FIFOFlags ff;
       try {

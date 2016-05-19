@@ -108,6 +108,7 @@ namespace DAQ
       SetFIFOConfig(0x82); // 0x82 = 0b0000.0000.1000.0010
       SetCPUConfig((kCLKOUTdisable|kCLKINVenable|kCLKSPD12MHz|kUSBFullSpeedAllow)+0x10); // 0x8012 = 0b1000.0000.0001.0010
       os << "Hardware revision: " << GetHWRevision() << "\n\t"
+         << "FPGA type: " << GetFPGAType() << "\n\t"
          << "Slave FIFO flags:" << "\n\t"
          << GetSlaveFIFOFlags() << "\n\t"
          << "Timeouts: low = " << GetTimeoutLow() << " ms / high = " << GetTimeoutHigh() << " ms\n\t"
@@ -139,7 +140,7 @@ namespace DAQ
   void
   QuickUSBHandler::Write(uint16_t addr, std::vector<uint8_t>& words, uint16_t size) const
   {
-    QuickUsbWriteSetting(fHandle, kWordWide, 0); // 8 bits words
+    SetWordWide(k8bits);
 
     uint8_t* data = &words[0];
     int result = QuickUsbWriteCommand(fHandle, addr, data, size);
@@ -156,7 +157,7 @@ namespace DAQ
   std::vector<uint8_t>
   QuickUSBHandler::Fetch(uint16_t addr, uint16_t size) const
   {
-    QuickUsbWriteSetting(fHandle, kWordWide, 0); // 8 bits words
+    SetWordWide(k8bits);
 
     std::vector<uint8_t> out;
     uint8_t* data = new uint8_t[size];
@@ -184,9 +185,11 @@ namespace DAQ
   {
     const unsigned int num_buffers = 8, buffer_byte_size = 0x10000;
 
-    QuickUsbSetTimeout (fHandle, 1000);
-    QuickUsbWriteSetting(fHandle, 1, 1); // 16 bits words
-    QuickUsbWriteSetting(fHandle, 2, 32768+200); // readout register address
+    QuickUsbSetTimeout(fHandle, 1000);
+    SetWordWide(k16bits);
+
+    bool increment, enable_addr_bus;
+    SetDataAddress(200, increment=false, enable_addr_bus=true);
 
     int result = QuickUsbReadBulkDataStartStream(fHandle, 0, num_buffers, buffer_byte_size, callback, 0, &fStreamId, 8, 4);
     if (result==0) {
@@ -243,6 +246,7 @@ namespace DAQ
     }
     return os;
   }
+
   std::ostream&
   operator<<(std::ostream& os, const QuickUSBHandler::USBSpeed& sp) {
     switch (sp) {
@@ -253,9 +257,18 @@ namespace DAQ
   }
 
   std::ostream&
+  operator<<(std::ostream& os, const QuickUSBHandler::FPGAType& t) {
+    switch (t) {
+      case QuickUSBHandler::AlteraPassiveSerial: os << "Altera Passive Serial"; break;
+      case QuickUSBHandler::XilinxSlaveSerial:   os << "Xilinx Slave Serial"; break;
+    }
+    return os;
+  }
+
+  std::ostream&
   operator<<(std::ostream& os, const QuickUSBHandler::FIFOFlags& ff) {
     os << "  EP2 (write) FIFO: full? " << ff.WriteFIFOFull << " / empty? " << ff.WriteFIFOEmpty << "\n\t"
-       << "  EP6 (read) FIFO:  full? " << ff.ReadFIFOFull << " / empty? " << ff.ReadFIFOEmpty << "\n\t"
+       << "  EP6  (read) FIFO: full? " << ff.ReadFIFOFull << " / empty? " << ff.ReadFIFOEmpty << "\n\t"
        << "  Pins status: RDY1=" << ff.RDY1 << " / RDY0=" << ff.RDY0;
     return os;
   }
