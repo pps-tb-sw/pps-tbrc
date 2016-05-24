@@ -43,16 +43,16 @@ namespace DAQ
     inline ~TDC() {;}
     
     /// Submit the HPTDC setup word as a TDCSetup object
-    inline void SetSetupRegister(const TDCSetup& c) { fSetup = c; }
+    inline void SetSetupRegister(const PPSTimingMB::TDCSetup& c) { fSetup = c; }
     /// Retrieve the HPTDC setup word as a TDCSetup object
-    inline TDCSetup GetSetupRegister() { return fSetup; }
+    inline PPSTimingMB::TDCSetup GetSetupRegister() { return fSetup; }
     
     bool CheckFirmwareVersion() const;
     void SoftReset();
     TDCEventCollection FetchEvents();
     
     void ReadStatus() {
-      fStatus = ReadRegister<TDCStatus>(TDC_STATUS_REGISTER);
+      fStatus = ReadRegister<PPSTimingMB::TDCStatus>(FPGA_STATUS_ADDR);
     }
     
    private:
@@ -68,10 +68,10 @@ namespace DAQ
     unsigned int fId;
     QuickUSBHandler* fUSB;
     
-    TDCSetup fSetup;
-    TDCControl fControl;
-    TDCBoundaryScan fBS;
-    TDCStatus fStatus;
+    PPSTimingMB::TDCSetup fSetup;
+    PPSTimingMB::TDCControl fControl;
+    PPSTimingMB::TDCBoundaryScan fBS;
+    PPSTimingMB::TDCStatus fStatus;
   };
 }
 

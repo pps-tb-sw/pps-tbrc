@@ -58,11 +58,11 @@ namespace DAQ
     /// Socket actor type retrieval method
     inline SocketType GetType() const { return DETECTOR; }
 
-    TDCControl GetTDCControl() const;
-    TDCStatus GetTDCStatus() const;
+    PPSTimingMB::TDCControl GetTDCControl() const;
+    PPSTimingMB::TDCStatus GetTDCStatus() const;
     
-    inline void SetTDCSetup(const TDCSetup& s) { fSetupReg = s; SendSetupWord(); }
-    inline TDCSetup GetTDCSetup() const { return fSetupReg; }
+    inline void SetTDCSetup(const PPSTimingMB::TDCSetup& s) { fSetupReg = s; SendSetupWord(); }
+    inline PPSTimingMB::TDCSetup GetTDCSetup() const { return fSetupReg; }
 
    private:
     void RegisterTest() const;
@@ -75,7 +75,7 @@ namespace DAQ
     
     TDC* fTDC[NUM_HPTDC];
     bool fIsTDCInReadout;
-    TDCSetup fSetupReg;
+    PPSTimingMB::TDCSetup fSetupReg;
   };
 }
 

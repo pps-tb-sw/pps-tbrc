@@ -65,9 +65,9 @@ namespace DAQ
   { 
     const unsigned short size1 = 50, size2 = 31;
     
-    TDCRegister::word_t* word = fSetupReg.GetWords();
+    PPSTimingMB::TDCRegister::word_t* word = fSetupReg.GetWords();
     std::vector<uint8_t> part1, part2;
-    part1.push_back(0x50); // we set the register to write
+    part1.push_back(FPGA_SETUP_ADDR); // we set the register to write
     for (unsigned int i=0; i<fSetupReg.GetNumWords(); i++) {
       if (i<50) part1.push_back(word[i]);
       else part2.push_back(word[i]);
@@ -85,33 +85,33 @@ namespace DAQ
   {
     std::vector<uint8_t> part1, part2;
     try {
-      QuickUSBHandler::Write(0x0, 0x51); 
+      QuickUSBHandler::Write(0x0, FPGA_SETUP_ADDR); 
       part1 = QuickUSBHandler::Fetch(1, 50); 
       part2 = QuickUSBHandler::Fetch(51, 31);
     } catch (Exception& e) { e.Dump(); }
     part1.insert(part1.end(), part2.begin(), part2.end());
-    fSetupReg = TDCSetup(part1, true); // the bytes order is reversed
+    fSetupReg = PPSTimingMB::TDCSetup(part1, true); // the bytes order is reversed
   }
   
-  TDCControl
+  PPSTimingMB::TDCControl
   FPGAHandler::GetTDCControl() const
   {
     std::vector<uint8_t> word;
     try {
-      QuickUSBHandler::Write(0x0, 0x52); 
+      QuickUSBHandler::Write(0x0, FPGA_CONTROL_ADDR); 
       word = QuickUSBHandler::Fetch(1, 5);
-      return TDCControl(word);
+      return PPSTimingMB::TDCControl(word);
     } catch (Exception& e) { e.Dump(); }
   }
   
-  TDCStatus
+  PPSTimingMB::TDCStatus
   FPGAHandler::GetTDCStatus() const
   {
     std::vector<uint8_t> word;
     try {
-      QuickUSBHandler::Write(0x0, 0x54); 
+      QuickUSBHandler::Write(0x0, FPGA_STATUS_ADDR);
       word = QuickUSBHandler::Fetch(1, 8);
-      return TDCStatus(word);
+      return PPSTimingMB::TDCStatus(word);
     } catch (Exception& e) { e.Dump(); }
   }
   
@@ -144,8 +144,8 @@ namespace DAQ
     fOutput.write((char*)&th, sizeof(file_header_t));
     
     /*for (unsigned int i=0; i<NUM_HPTDC; i++) {
-        TDCSetup s = fTDC[i]->GetSetupRegister();
-        fOutput.write((char*)&s, sizeof(TDCSetup));
+        PPSTimingMB::TDCSetup s = fTDC[i]->GetSetupRegister();
+        fOutput.write((char*)&s, sizeof(PPSTimingMB::TDCSetup));
     }*/
   }
   

@@ -10,17 +10,17 @@ namespace DAQ
   void
   TDC::SendConfiguration()
   {
-    WriteRegister<TDCSetup>(TDC_SETUP_REGISTER, fSetup);
-    WriteRegister<TDCControl>(TDC_CONTROL_REGISTER, fControl);
-    WriteRegister<TDCBoundaryScan>(TDC_BS_REGISTER, fBS);
+    WriteRegister<PPSTimingMB::TDCSetup>(FPGA_SETUP_ADDR, fSetup);
+    WriteRegister<PPSTimingMB::TDCControl>(FPGA_CONTROL_ADDR, fControl);
+    //WriteRegister<PPSTimingMB::TDCBoundaryScan>(FPGA_BS_ADDR, fBS);
   }
   
   void
   TDC::ReadConfiguration()
   {
-    fSetup = ReadRegister<TDCSetup>(TDC_SETUP_REGISTER);
-    fControl = ReadRegister<TDCControl>(TDC_CONTROL_REGISTER);
-    fBS = ReadRegister<TDCBoundaryScan>(TDC_BS_REGISTER);
+    fSetup = ReadRegister<PPSTimingMB::TDCSetup>(FPGA_SETUP_ADDR);
+    fControl = ReadRegister<PPSTimingMB::TDCControl>(FPGA_CONTROL_ADDR);
+    //fBS = ReadRegister<PPSTimingMB::TDCBoundaryScan>(FPGA_BS_ADDR);
   }
   
   bool
@@ -30,6 +30,7 @@ namespace DAQ
     unsigned int version = 0;
     do {
       try {
+        
         /*// First we initiate the communication
         fUSB->Write(FW_START, 1);
         if (fUSB->Fetch(1)!=0) { attempts++; continue; }
