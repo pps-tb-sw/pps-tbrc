@@ -47,16 +47,16 @@ namespace DAQ
       //reg = QuickUSBHandler::Fetch(0x70, 2);
       reg = QuickUSBHandler::Fetch(0x70, 1);
     } catch (Exception& e) { e.Dump(); }
-    std::cout << std::hex << (unsigned short)reg[0] << std::endl;
-    return;
     //if (reg[0]!=0x80 or reg[1]!=0x80) {
-    if (reg[0]!=0x80 or reg[1]!=0x80) {
+    if (reg[0]!=0x80) {
       std::ostringstream os;
-      os << "Register test failed! got 0x" << std::hex << static_cast<unsigned int>(reg[0]) << " and 0x" << std::hex << static_cast<unsigned int>(reg[1]);
+      //os << "Register test failed! got 0x" << std::hex << static_cast<unsigned int>(reg[0]) << " and 0x" << std::hex << static_cast<unsigned int>(reg[1]);
+      os << "Register test failed! got 0x" << std::hex << static_cast<unsigned int>(reg[0]);
       throw Exception(__PRETTY_FUNCTION__, os.str(), Fatal);
     }
     std::ostringstream os;
-    os << "Passed the register test (got 0x" << std::hex << static_cast<unsigned int>(reg[0]) << " and 0x" << std::hex << static_cast<unsigned int>(reg[1]) << ")";
+    //os << "Passed the register test (got 0x" << std::hex << static_cast<unsigned int>(reg[0]) << " and 0x" << std::hex << static_cast<unsigned int>(reg[1]) << ")";
+    os << "Passed the register test (got 0x" << std::hex << static_cast<unsigned int>(reg[0]) << ")";
     PrintInfo(os.str());
   }
   
