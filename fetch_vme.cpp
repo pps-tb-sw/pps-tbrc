@@ -43,6 +43,9 @@ int main(int argc, char *argv[]) {
   fh.acq_mode = acq_mode;
   fh.det_mode = det_mode;
 
+  unsigned int num_hits[32];
+  for (unsigned int i=0; i<32; i++) num_hits[i] = 0;
+
   try {
     const unsigned long tdc_address = 0x00ee0000;
 
@@ -79,6 +82,11 @@ int main(int argc, char *argv[]) {
       ec = tdc->FetchEvents();
       if (ec.size()==0) continue; // no events were fetched
       for (VME::TDCEventCollection::const_iterator e=ec.begin(); e!=ec.end(); e++) {
+        if (e->GetType()==VME::TDCEvent::TDCMeasurement and !e->IsTrailing()) {
+          const unsigned int channel_id = e->GetChannelId();
+          num_hits[channel_id]++;
+          std::cout << "--> new hit on channel " << channel_id << " :: total on this channel: " << num_hits[channel_id] << std::endl;
+        }
         word = e->GetWord();
         out_file.write((char*)&word, sizeof(uint32_t));
       }
