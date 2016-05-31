@@ -41,7 +41,7 @@ main(int argc, char* argv[])
   while (true) {
     try {
       if (!f.GetNextMeasurement(channel_id, &m)) break;
-      m.Dump();
+      //m.Dump();
       for (unsigned int i=0; i<m.NumEvents(); i++) {
         //std::cout << "--> " << (m.GetToT(i)*25./1024.) << std::endl;
         hist_lead->Fill(m.GetLeadingTime(i)*25./1024.);

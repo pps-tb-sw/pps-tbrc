@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
   const VME::DetectionMode det_mode = VME::TRAILEAD;
   
   ofstream out_file;
+  const unsigned int num_channels = 32;
   unsigned int num_events = 0; 
   VME::TDCV1x90* tdc = NULL;
   VME::TDCEventCollection ec;
@@ -43,8 +44,8 @@ int main(int argc, char *argv[]) {
   fh.acq_mode = acq_mode;
   fh.det_mode = det_mode;
 
-  unsigned int num_hits[32];
-  for (unsigned int i=0; i<32; i++) num_hits[i] = 0;
+  unsigned int num_hits[num_channels];
+  for (unsigned int i=0; i<num_channels; i++) num_hits[i] = 0;
 
   try {
     const unsigned long tdc_address = 0x00ee0000;
@@ -107,7 +108,15 @@ int main(int argc, char *argv[]) {
              << " (" << nmin << " min " << nsec << " sec)"
              << endl;
 
-        cerr << endl << "Acquired " << num_events << " words in this run" << endl;
+        unsigned int num_hits_allchannels = 0;
+        for (unsigned int i=0; i<num_channels; i++) { num_hits_allchannels += num_hits[i]; }
+
+        cerr << endl << "Acquired " << num_events << " word(s) in this run, corresponding to " << num_hits_allchannels << " leading edge(s) in all channels" << endl
+             << "Leading edges per channel:" << endl;
+        for (unsigned int i=0; i<num_channels/2; i++) {
+          cerr << " --> Channel " << setw(2) << i << ": " << setw(5) << num_hits[i]
+               << "  |  Channel " << setw(2) << (i+num_channels/2) << ": " << setw(5) << num_hits[i+num_channels/2] << endl;
+        }
     
         delete vme;
       } catch (Exception& e) { e.Dump(); }
