@@ -22,12 +22,15 @@ void CtrlC(int aSig) {
 int main(int argc, char *argv[]) {
   signal(SIGINT, CtrlC);
 
+  std::string output_filename = "events.dat";
+  if (argc>1) output_filename = argv[1];
+
   const VME::AcquisitionMode acq_mode = VME::TRIG_MATCH;
   //const VME::AcquisitionMode acq_mode = VME::CONT_STORAGE;
   const VME::DetectionMode det_mode = VME::TRAILEAD;
   
   ofstream out_file;
-  unsigned int num_events; 
+  unsigned int num_events = 0; 
   VME::TDCV1x90* tdc = NULL;
   VME::TDCEventCollection ec;
 
@@ -62,7 +65,7 @@ int main(int argc, char *argv[]) {
     cerr << endl << "*** Ready for acquisition! ***" << endl;
 
     // TDC output files configuration
-    out_file.open("events.dat");
+    out_file.open(output_filename.c_str());
     if (!out_file.is_open()) { throw Exception(__PRETTY_FUNCTION__, "Error opening file", Fatal); }
 
     // Write the file header for offline analysis

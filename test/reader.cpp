@@ -14,7 +14,7 @@ using namespace VME;
 int
 main(int argc, char* argv[])
 {
-  unsigned int channel_id = 0;
+  unsigned int channel_id = 1;
   if (argc<2) {
     cerr << "Usage:\n\t" << argv[0] << " <input file>" << endl;
     return -1;
