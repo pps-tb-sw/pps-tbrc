@@ -83,6 +83,9 @@ int main(int argc, char *argv[]) {
       ec = tdc->FetchEvents();
       if (ec.size()==0) continue; // no events were fetched
       for (VME::TDCEventCollection::const_iterator e=ec.begin(); e!=ec.end(); e++) {
+        if (e->GetType()==VME::TDCEvent::TDCHeader) {
+          //std::cerr << "----> Received trigger #" << e->GetEventId() << std::endl;
+        }
         if (e->GetType()==VME::TDCEvent::TDCMeasurement) {
           const unsigned int channel_id = e->GetChannelId();
           if (!e->IsTrailing()) {
@@ -90,7 +93,7 @@ int main(int argc, char *argv[]) {
             std::cout << "--> new hit on channel " << channel_id << " :: total on this channel: " << num_hits[channel_id] << std::endl;
           }
           else { // trailing edge
-            std::cout << "trailing edge for channel " << channel_id << std::endl;
+            //std::cout << "trailing edge for channel " << channel_id << std::endl;
           }
         }
         word = e->GetWord();

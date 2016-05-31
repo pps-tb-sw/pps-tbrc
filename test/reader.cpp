@@ -29,8 +29,11 @@ main(int argc, char* argv[])
   TH1D* hist_trail = new TH1D("trail", "", 500, 0., 500.);
   TH1D* hist_lead_zoom = new TH1D("lead_zoom", "", 600, 255., 325.);
   TH1D* hist_trail_zoom = new TH1D("trail_zoom", "", 600, 255., 325.);
-  TH1D* hist_tot = new TH1D("tot", "", 100, 15., 20.);
-  TH1D* hist_numevts = new TH1D("nevts", "", 100, -.5, 99.5);
+  TH1D* hist_lead_no_trail = new TH1D("leading_no_trail", "", 2, 0., 2.);
+  TH1D* hist_lead_no_trail_leadingedge = new TH1D("leading_no_trail_leadingedge", "", 500, 0, 500.);
+  TH1D* hist_lead_trail_leadingedge = new TH1D("leading_trail_leadingedge", "", 500, 0, 500.);
+  TH1D* hist_tot = new TH1D("tot", "", 500, 0., 100.);
+  TH1D* hist_numevts = new TH1D("nevts", "", 10, -.5, 9.5);
   
   FileReader f(argv[1]);
   cout << "Run/burst id: " << f.GetRunId() << " / " << f.GetBurstId() << endl;
@@ -48,7 +51,10 @@ main(int argc, char* argv[])
         hist_trail->Fill(m.GetTrailingTime(i)*25./1024.);
         hist_lead_zoom->Fill(m.GetLeadingTime(i)*25./1024.);
         hist_trail_zoom->Fill(m.GetTrailingTime(i)*25./1024.);
-        hist_tot->Fill(m.GetToT(i)*25./1024.);
+        hist_lead_no_trail->Fill(m.HasTrailingEdge(i));
+	if (!m.HasTrailingEdge(i)) hist_lead_no_trail_leadingedge->Fill(m.GetLeadingTime(i)*25./1024.);
+        else                       hist_lead_trail_leadingedge->Fill(m.GetLeadingTime(i)*25./1024.);
+	hist_tot->Fill(m.GetToT(i)*25./1024.);
         //std::cout << "ettt=" << m.GetETTT() << std::endl;
       }
       num_events += m.NumEvents();
@@ -104,6 +110,22 @@ main(int argc, char* argv[])
   hist_numevts->GetXaxis()->SetTitle(Form("Hits multiplicity in channel %d / trigger",channel_id));
   hist_numevts->GetYaxis()->SetTitle("Triggers");
   c_nevts.Save("png", "plots/");
+
+  DQM::PPSCanvas c_fraction_no_trailing("dist_fraction_no_trailing_edge");
+  hist_lead_no_trail->Draw();
+  hist_lead_no_trail->GetXaxis()->SetTitle("Has trailing edge?");
+  hist_lead_no_trail->GetYaxis()->SetTitle(Form("Events in channel %d", channel_id));
+  hist_lead_no_trail->SetMinimum(0.5);
+  c_fraction_no_trailing.Save("png", "plots/");
+
+  DQM::PPSCanvas c_no_trailing_leadingedge("dist_leadingedge_no_trailing_edge");
+  hist_lead_trail_leadingedge->Draw();
+  hist_lead_no_trail_leadingedge->Draw("same");
+  c_no_trailing_leadingedge.AddLegendEntry(hist_lead_no_trail_leadingedge, "No trailing edge in event");
+  hist_lead_trail_leadingedge->SetLineColor(kRed);
+  c_no_trailing_leadingedge.AddLegendEntry(hist_lead_trail_leadingedge, "Trailing edge in event");
+  hist_lead_trail_leadingedge->GetXaxis()->SetTitle("Leading edge (ns)");
+  c_no_trailing_leadingedge.Save("png", "plots/");
 
   return 0;
 }
