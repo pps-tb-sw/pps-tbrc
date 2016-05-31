@@ -2,7 +2,7 @@
 
 #include "FileReader.h"
 
-#include "TCanvas.h"
+#include "PPSCanvas.h"
 #include "TH1.h"
 #include "TF1.h"
 #include "TLegend.h"
@@ -62,21 +62,18 @@ main(int argc, char* argv[])
   gStyle->SetPadGridX(true); gStyle->SetPadGridY(true);
   gStyle->SetPadTickX(true); gStyle->SetPadTickY(true);
  
-  TCanvas* c_time = new TCanvas;
-  TLegend* leg = new TLegend(0.15, 0.3, 0.35, 0.4);
+  DQM::PPSCanvas c_time("dist_edgetime");
   hist_lead->Draw();
-  leg->AddEntry(hist_lead, "Leading edge");
+  c_time.AddLegendEntry(hist_lead, "Leading edge");
   hist_trail->Draw("same");
   hist_trail->SetLineColor(kRed+1);
-  leg->AddEntry(hist_trail, "Trailing edge");
+  c_time.AddLegendEntry(hist_trail, "Trailing edge");
   hist_lead->GetXaxis()->SetTitle("Hit edge time (ns)");
   hist_lead->GetYaxis()->SetTitle(Form("Events in channel %d",channel_id));
-  leg->Draw();
-  c_time->SaveAs("dist_edgetime.png");
+  c_time.Save("png");
 
   gStyle->SetOptStat(0);
-  TCanvas* c_time_zoom = new TCanvas;
-  TLegend* leg2 = new TLegend(0.45, 0.75, 0.85, 0.85);
+  DQM::PPSCanvas c_time_zoom("dist_edgetime_zoom");
   hist_lead_zoom->Draw();
   hist_trail_zoom->Draw("same");
   hist_trail_zoom->SetLineColor(kRed+1);
@@ -89,26 +86,24 @@ main(int argc, char* argv[])
   leg2->AddEntry(hist_lead_zoom, Form("Leading edge  #mu=%.3g, #sigma=%.3g",f1->GetParameter(1),f1->GetParameter(2)), "l");
   leg2->AddEntry(hist_trail_zoom, Form("Trailing edge    #mu=%.3g, #sigma=%.3g",f2->GetParameter(1),f2->GetParameter(2)), "l");
   leg2->Draw();*/
-  c_time_zoom->SaveAs("dist_edgetime_zoom.png");
-  c_time_zoom->SaveAs("dist_edgetime_zoom.pdf");
+  c_time_zoom.Save("png");
+  c_time_zoom.Save("pdf");
   cout << "integral: " << hist_lead_zoom->Integral() << " / " << hist_trail_zoom->Integral() << endl;
 
   gStyle->SetOptStat(1111);
-  TCanvas* c_tot = new TCanvas;
+  DQM::PPSCanvas c_tot("dist_tot");
   hist_tot->Draw();
   hist_tot->GetXaxis()->SetTitle("Time over threshold (ns)");
   hist_tot->GetYaxis()->SetTitle(Form("Events in channel %d",channel_id));
   hist_tot->GetYaxis()->SetTitleOffset(1.45);
-  c_tot->SaveAs("dist_tot.png");
-  c_tot->SaveAs("dist_tot.pdf");
-  c_tot->SetLogy();
-  c_tot->SaveAs("dist_tot_logscale.png");
+  c_tot.Save("png");
+  c_tot.Save("pdf");
 
-  TCanvas* c_nevts = new TCanvas;
+  DQM::PPSCanvas c_nevts("dist_nevts");
   hist_numevts->Draw();
   hist_numevts->GetXaxis()->SetTitle(Form("Hits multiplicity in channel %d / trigger",channel_id));
   hist_numevts->GetYaxis()->SetTitle("Triggers");
-  c_nevts->SaveAs("dist_nevts.png");
+  c_nevts.Save("png");
 
   return 0;
 }

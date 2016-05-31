@@ -98,6 +98,10 @@ namespace DQM
         c1->SetLogy();
         TCanvas::SaveAs(Form("%s/%s_logscale.%s", path.Data(), TCanvas::GetName(), ext.Data()));
       }
+      inline void AddLegendEntry(TObject* obj, const char* label, Option_t* opt="") {
+        if (!fLegend) return;
+        fLegend->AddEntry(obj, label, opt);
+      }
 
     private:
       inline void Build() {
