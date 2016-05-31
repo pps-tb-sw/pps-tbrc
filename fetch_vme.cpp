@@ -21,41 +21,58 @@ void CtrlC(int aSig) {
 
 int main(int argc, char *argv[]) {
   signal(SIGINT, CtrlC);
+
+  const VME::AcquisitionMode acq_mode = VME::TRIG_MATCH;
+  //const VME::AcquisitionMode acq_mode = VME::CONT_STORAGE;
+  const VME::DetectionMode det_mode = VME::TRAILEAD;
   
   ofstream out_file;
   unsigned int num_events; 
-
+  VME::TDCV1x90* tdc = NULL;
   VME::TDCEventCollection ec;
 
   time_t t_beg = time(0);
 
+  file_header_t fh;
+  fh.magic = 0x30535050; // PPS0 in ASCII
+  fh.run_id = 0;
+  fh.spill_id = 0;
+  fh.acq_mode = acq_mode;
+  fh.det_mode = det_mode;
+
   try {
-    const bool with_socket = false;
-    const unsigned long tdc_address = 0x12340000;
+    const unsigned long tdc_address = 0x00ee0000;
 
-    vme = new VMEReader("/dev/a2818_0", VME::CAEN_V2718, with_socket);
-    vme->AddTDC(tdc_address);
+    vme = new VMEReader("/dev/v1718_0", VME::CAEN_V1718, false);
 
-    VME::TDCV1x90* tdc = vme->GetTDC(tdc_address);
-    tdc->SetAcquisitionMode(VME::TRIG_MATCH);
-    tdc->SetDetectionMode(VME::TRAILEAD);
+    try { vme->AddTDC(tdc_address); } catch (Exception& e) { e.Dump(); }
+    tdc = vme->GetTDC(tdc_address);
+    tdc->SetAcquisitionMode(acq_mode);
+    tdc->SetDetectionMode(det_mode);
+
+    if (acq_mode==VME::TRIG_MATCH) {
+      tdc->SetWindowWidth(20); // in (25 ns) clock cycles
+      tdc->SetWindowOffset(-20);
+      tdc->GetTriggerConfiguration().Dump();
+    }
 
     t_beg = time(0);
 
     // Initial dump of the acquisition parameters before writing the files
     cerr << endl << "*** Ready for acquisition! ***" << endl;
 
-    out_file.open("events.dat");
-    
     // TDC output files configuration
-    if (!out_file.is_open()) {
-      throw Exception(__PRETTY_FUNCTION__, "Error opening file", Fatal);
-    }
+    out_file.open("events.dat");
+    if (!out_file.is_open()) { throw Exception(__PRETTY_FUNCTION__, "Error opening file", Fatal); }
+
+    // Write the file header for offline analysis
+    out_file.write((char*)&fh, sizeof(file_header_t));
       
-    // Data readout from the two TDC boards
+    // Data readout from the TDC board
     uint32_t word;
     num_events = 0;
     while (true) {
+      if (!tdc) break;
       ec = tdc->FetchEvents();
       if (ec.size()==0) continue; // no events were fetched
       for (VME::TDCEventCollection::const_iterator e=ec.begin(); e!=ec.end(); e++) {

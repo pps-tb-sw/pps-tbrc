@@ -59,7 +59,7 @@ namespace VME
     std::stringstream s; s << "TDC with base address 0x" << std::hex << baseaddr << " successfully built!";
     PrintInfo(s.str());
 
-    GetTriggerConfiguration().Dump();
+    //GetTriggerConfiguration().Dump();
 
   }
 
