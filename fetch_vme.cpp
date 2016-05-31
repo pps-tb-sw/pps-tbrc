@@ -83,10 +83,15 @@ int main(int argc, char *argv[]) {
       ec = tdc->FetchEvents();
       if (ec.size()==0) continue; // no events were fetched
       for (VME::TDCEventCollection::const_iterator e=ec.begin(); e!=ec.end(); e++) {
-        if (e->GetType()==VME::TDCEvent::TDCMeasurement and !e->IsTrailing()) {
+        if (e->GetType()==VME::TDCEvent::TDCMeasurement) {
           const unsigned int channel_id = e->GetChannelId();
-          num_hits[channel_id]++;
-          std::cout << "--> new hit on channel " << channel_id << " :: total on this channel: " << num_hits[channel_id] << std::endl;
+          if (!e->IsTrailing()) {
+            num_hits[channel_id]++;
+            std::cout << "--> new hit on channel " << channel_id << " :: total on this channel: " << num_hits[channel_id] << std::endl;
+          }
+          else { // trailing edge
+            std::cout << "trailing edge for channel " << channel_id << std::endl;
+          }
         }
         word = e->GetWord();
         out_file.write((char*)&word, sizeof(uint32_t));

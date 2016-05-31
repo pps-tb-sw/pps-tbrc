@@ -41,24 +41,32 @@ namespace VME
         fMap.clear(); fEvents.clear();
         TDCEvent leading; bool has_leading = false;
         for (std::vector<TDCEvent>::const_iterator e=v.begin(); e!=v.end(); e++) {
-          switch (e->GetType()) {
-            case TDCEvent::GlobalHeader:  fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::GlobalHeader, *e)); break;
-            case TDCEvent::GlobalTrailer: fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::GlobalTrailer, *e)); break;
-            case TDCEvent::TDCHeader:     fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::TDCHeader, *e)); break;
-            case TDCEvent::TDCTrailer:    fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::TDCTrailer, *e)); break;
-            case TDCEvent::ETTT:          fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::ETTT, *e)); break;
-            case TDCEvent::TDCError:      fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::TDCError, *e)); break;
-            case TDCEvent::TDCMeasurement:
-              if (!e->IsTrailing()) { leading = *e; has_leading = true; }
-              else {
-                if (!has_leading) throw Exception(__PRETTY_FUNCTION__, "Failed to retrieve leading/trailing edges", JustWarning);//return;
-                fEvents.push_back(std::pair<TDCEvent,TDCEvent>(leading, *e));
+          const TDCEvent::EventType type = e->GetType();
+          if (type==TDCEvent::GlobalHeader)       { fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::GlobalHeader, *e)); }
+          else if (type==TDCEvent::GlobalTrailer) { fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::GlobalTrailer, *e)); }
+          else if (type==TDCEvent::TDCHeader)     { fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::TDCHeader, *e)); }
+          else if (type==TDCEvent::TDCTrailer)    { fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::TDCTrailer, *e)); }
+          else if (type==TDCEvent::ETTT)          { fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::ETTT, *e)); }
+          else if (type==TDCEvent::TDCError)      { fMap.insert(std::pair<TDCEvent::EventType,TDCEvent>(TDCEvent::TDCError, *e)); }
+          else if (type==TDCEvent::TDCMeasurement) {
+            if (!e->IsTrailing()) {
+              if (has_leading) { // did not find a trailing edge for the previous measurement
+                fEvents.push_back(std::pair<TDCEvent,TDCEvent>(leading, TDCEvent(0))); //FIXME no trailing edge for this hit
                 num_measurements++;
+                has_leading = false;
+                continue;
               }
-              break;
-            case TDCEvent::Filler:
-            default:
-              break;
+              leading = *e;
+              has_leading = true;
+            }
+            else { // trailing edge
+              if (!has_leading) {
+                //throw Exception(__PRETTY_FUNCTION__, "Failed to retrieve leading/trailing edges", JustWarning);//return;
+                leading = TDCEvent(); //FIXME
+              }
+              fEvents.push_back(std::pair<TDCEvent,TDCEvent>(leading, *e));
+              num_measurements++;
+            }
           }
         }
       }
@@ -67,8 +75,14 @@ namespace VME
         if (event_id>=fEvents.size()) { return 0; }
         return fEvents[event_id].first.GetTime();
       }
+      inline bool HasTrailingEdge(unsigned short event_id=0) {
+        if (event_id>=fEvents.size()) { return false; }
+        if (fEvents[event_id].second.GetWord()==0) return false;
+        return true;
+      }
       inline uint32_t GetTrailingTime(unsigned short event_id=0) {
         if (event_id>=fEvents.size()) { return 0; }
+        if (!HasTrailingEdge(event_id)) return 0;
         return fEvents[event_id].second.GetTime();
       }
       inline uint16_t GetToT(unsigned short event_id=0) {
