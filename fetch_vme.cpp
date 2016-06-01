@@ -85,10 +85,11 @@ int main(int argc, char *argv[]) {
       ec = tdc->FetchEvents();
       if (ec.size()==0) continue; // no events were fetched
       for (VME::TDCEventCollection::const_iterator e=ec.begin(); e!=ec.end(); e++) {
-        if (e->GetType()==VME::TDCEvent::TDCHeader) {
-          //std::cerr << "----> Received trigger #" << e->GetEventId() << std::endl;
+        const VME::TDCEvent::EventType type = e->GetType();
+        if (type==VME::TDCEvent::TDCHeader && (e->GetEventId()%100==0)) {
+          cerr << "----> Received trigger #" << e->GetEventId() << endl;
         }
-        if (e->GetType()==VME::TDCEvent::TDCMeasurement) {
+        if (type==VME::TDCEvent::TDCMeasurement) {
           const unsigned int channel_id = e->GetChannelId();
           if (!e->IsTrailing()) {
             num_hits[channel_id]++;
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]) {
         time_t t_end = time(0);
         double nsec_tot = difftime(t_end, t_beg), nsec = fmod(nsec_tot,60), nmin = (nsec_tot-nsec)/60.;
         cerr << endl << "*** Acquisition stopped! ***" << endl
-             << "Local time: " << asctime(localtime(&t_end))
+             << "Local time: " << ctime(&t_end)
              << "Total acquisition time: " << difftime(t_end, t_beg) << " seconds"
              << " (" << nmin << " min " << nsec << " sec)"
              << endl;
@@ -121,10 +122,23 @@ int main(int argc, char *argv[]) {
         unsigned int num_hits_allchannels = 0;
         for (unsigned int i=0; i<num_channels; i++) { num_hits_allchannels += num_hits[i]; }
 
-        cerr << endl << "Acquired " << num_events << " word(s) in this run, corresponding to " << num_hits_allchannels << " leading edge(s) in all channels" << endl
+        ofstream log("last_run.log");
+        log << "Last run stopped at local time: " << ctime(&t_end)
+            << "Total acquisition time: " << difftime(t_end, t_beg) << " seconds"
+            << " (" << nmin << " min " << nsec << " sec)"
+            << endl
+            << "Acquired " << num_events << " word(s) in this run, corresponding to " << num_hits_allchannels << " leading edge(s) in all channels" << endl
+            << "Leading edges per channel:" << endl;
+        for (unsigned int i=0; i<num_channels/2; i++) {
+          log << " --> Channel " << setw(2) << i << ": " << setw(5) << num_hits[i]
+              << "  |  Channel " << setw(2) << (i+num_channels/2) << ": " << setw(5) << num_hits[i+num_channels/2] << endl;
+        }
+        log.close();
+
+        cout << endl << "Acquired " << num_events << " word(s) in this run, corresponding to " << num_hits_allchannels << " leading edge(s) in all channels" << endl
              << "Leading edges per channel:" << endl;
         for (unsigned int i=0; i<num_channels/2; i++) {
-          cerr << " --> Channel " << setw(2) << i << ": " << setw(5) << num_hits[i]
+          cout << " --> Channel " << setw(2) << i << ": " << setw(5) << num_hits[i]
                << "  |  Channel " << setw(2) << (i+num_channels/2) << ": " << setw(5) << num_hits[i+num_channels/2] << endl;
         }
     
