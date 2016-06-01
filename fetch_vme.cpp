@@ -50,9 +50,11 @@ int main(int argc, char *argv[]) {
   try {
     const unsigned long tdc_address = 0x00ee0000;
 
-    vme = new VMEReader("/dev/v1718_0", VME::CAEN_V1718, false);
+    vme = new VMEReader("/dev/usb/v1718_0", VME::CAEN_V1718, false);
 
-    try { vme->AddTDC(tdc_address); } catch (Exception& e) { e.Dump(); }
+    try { vme->AddTDC(tdc_address); } catch (Exception& e) {
+      if (e.ErrorNumber()!=TDC_ACQ_START) e.Dump();
+    }
     tdc = vme->GetTDC(tdc_address);
     tdc->SetAcquisitionMode(acq_mode);
     tdc->SetDetectionMode(det_mode);
