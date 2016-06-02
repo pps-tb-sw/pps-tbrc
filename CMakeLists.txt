@@ -34,6 +34,10 @@ add_executable(ppsFetch fetch_vme.cpp $<TARGET_OBJECTS:src_lib> $<TARGET_OBJECTS
 target_link_libraries(ppsFetch caen)
 set_property(TARGET ppsFetch PROPERTY LINK_FLAGS "-lCAENVME -ltinyxml2 -lsqlite3")
 
+add_executable(ppsFetch-auto fetch_vme_autofile.cpp $<TARGET_OBJECTS:src_lib> $<TARGET_OBJECTS:det_lib>)
+target_link_libraries(ppsFetch-auto caen)
+set_property(TARGET ppsFetch-auto PROPERTY LINK_FLAGS "-lCAENVME -ltinyxml2 -lsqlite3")
+
 add_executable(NINOsettings change_nino_threshold_voltage.cpp $<TARGET_OBJECTS:src_lib> $<TARGET_OBJECTS:det_lib>)
 target_link_libraries(NINOsettings caen)
 set_property(TARGET NINOsettings PROPERTY LINK_FLAGS "-lCAENVME -ltinyxml2 -lsqlite3")

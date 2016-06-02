@@ -27,6 +27,8 @@ main(int argc, char* argv[])
   unsigned int num_events, num_triggers;
   TH1D* hist_lead = new TH1D("lead", "", 500, 0., 500.);
   TH1D* hist_trail = new TH1D("trail", "", 500, 0., 500.);
+  TH1D* hist_strangetot_lead = new TH1D("strangetot_lead", "", 500, 0., 500.);
+  TH1D* hist_strangetot_trail = new TH1D("strangetot_trail", "", 500, 0., 500.);
   TH1D* hist_lead_zoom = new TH1D("lead_zoom", "", 600, 255., 325.);
   TH1D* hist_trail_zoom = new TH1D("trail_zoom", "", 600, 255., 325.);
   TH1D* hist_lead_no_trail = new TH1D("leading_no_trail", "", 2, 0., 2.);
@@ -55,6 +57,11 @@ main(int argc, char* argv[])
 	if (!m.HasTrailingEdge(i)) hist_lead_no_trail_leadingedge->Fill(m.GetLeadingTime(i)*25./1024.);
         else                       hist_lead_trail_leadingedge->Fill(m.GetLeadingTime(i)*25./1024.);
 	hist_tot->Fill(m.GetToT(i)*25./1024.);
+        if (m.GetToT(i)*25./1024>40.) {
+          cout << "-----> " << m.GetToT(i)*25./1024 << " -----> " << i << " -- " << m.GetLeadingTime(i)*25./1024 << endl;
+          hist_strangetot_lead->Fill(m.GetLeadingTime(i)*25./1024.);
+          hist_strangetot_trail->Fill(m.GetTrailingTime(i)*25./1024.);
+        }
         //std::cout << "ettt=" << m.GetETTT() << std::endl;
       }
       num_events += m.NumEvents();
@@ -77,6 +84,17 @@ main(int argc, char* argv[])
   hist_lead->GetXaxis()->SetTitle("Hit edge time (ns)");
   hist_lead->GetYaxis()->SetTitle(Form("Events in channel %d",channel_id));
   c_time.Save("png", "plots/");
+
+  gStyle->SetOptStat(0);
+  DQM::PPSCanvas c_strangetot_time("dist_strangetot_edgetime");
+  hist_strangetot_lead->Draw();
+  c_strangetot_time.AddLegendEntry(hist_strangetot_lead, "Leading edge");
+  hist_strangetot_trail->Draw("same");
+  hist_strangetot_trail->SetLineColor(kRed+1);
+  c_strangetot_time.AddLegendEntry(hist_strangetot_trail, "Trailing edge");
+  hist_strangetot_lead->GetXaxis()->SetTitle("Hit edge time (ns) (ToT > 40 ns)");
+  hist_strangetot_lead->GetYaxis()->SetTitle(Form("Events in channel %d",channel_id));
+  c_strangetot_time.Save("png", "plots/");
 
   gStyle->SetOptStat(0);
   DQM::PPSCanvas c_time_zoom("dist_edgetime_zoom");
